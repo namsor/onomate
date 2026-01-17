@@ -1,0 +1,102 @@
+{
+  "session_id": "session_2024_01_17_001",
+  "created_at": "2024-01-17T10:00:00Z",
+  "updated_at": "2024-01-17T10:00:00Z",
+  "status": "in_progress",
+  
+  "session_metadata": {
+    "founders": ["founder_a", "founder_b"],
+    "facilitator_agent": "facilitator",
+    "current_flow": "intake",
+    "current_stage": "welcome",
+    "estimated_duration_minutes": 180,
+    "actual_duration_minutes": 0
+  },
+  
+  "progress_tracking": {
+    "flows_completed": [],
+    "current_objectives": [],
+    "next_milestones": [],
+    "completion_percentage": 0
+  },
+  
+  "conversation_state": {
+    "energy_level": "high",
+    "tension_level": "low",
+    "engagement_scores": {
+      "founder_a": 0.8,
+      "founder_b": 0.8
+    },
+    "last_intervention": null,
+    "conversation_health": "healthy"
+  },
+  
+  "decision_trail": [
+    {
+      "timestamp": "2024-01-17T10:00:00Z",
+      "decision_type": "session_start",
+      "details": "Initiated naming session for co-founders",
+      "agents_involved": ["facilitator"],
+      "founder_input": true
+    }
+  ],
+  
+  "naming_journey": {
+    "constraints_gathered": false,
+    "alignment_achieved": false,
+    "names_generated": [],
+    "names_evaluated": [],
+    "shortlist": [],
+    "final_decision": null
+  },
+  
+  "agent_interactions": [
+    {
+      "timestamp": "2024-01-17T10:00:00Z",
+      "agent": "facilitator",
+      "action": "session_initialization",
+      "inputs": [],
+      "outputs": ["welcome_message"],
+      "duration_ms": 0
+    }
+  ],
+  
+  "founder_feedback": {
+    "founder_a": {
+      "satisfaction_score": null,
+      "concerns_raised": [],
+      "positive_feedback": [],
+      "engagement_notes": ""
+    },
+    "founder_b": {
+      "satisfaction_score": null,
+      "concerns_raised": [],
+      "positive_feedback": [],
+      "engagement_notes": ""
+    }
+  },
+  
+  "session_outcomes": {
+    "final_name_selected": null,
+    "consensus_achieved": false,
+    "next_steps_identified": [],
+    "follow_up_needed": false,
+    "session_rating": null
+  },
+  
+  "technical_metadata": {
+    "skybridge_version": "1.0.0",
+    "agent_versions": {
+      "interviewer": "1.0.0",
+      "synthesizer": "1.0.0", 
+      "namer": "1.0.0",
+      "critic": "1.0.0",
+      "facilitator": "1.0.0"
+    },
+    "performance_metrics": {
+      "total_api_calls": 0,
+      "average_response_time_ms": 0,
+      "error_count": 0
+    }
+  }
+}

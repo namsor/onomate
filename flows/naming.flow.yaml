@@ -1,0 +1,151 @@
+name: "naming"
+version: "1.0.0"
+description: "Name generation and initial filtering based on aligned constraints"
+
+triggers:
+  - flow: "alignment"
+    completion: "success"
+
+agents:
+  primary: "namer"
+  supporting: ["critic", "facilitator"]
+
+prerequisites:
+  - alignment_report_exists
+  - shared_constraints_defined
+  - naming_direction_set
+
+stages:
+  - name: "generation_preparation"
+    duration: 300  # 5 minutes
+    actions:
+      - agent: "facilitator"
+        action: "set_creative_context"
+        message: "Now for the fun part! Based on our alignment, I'll generate name suggestions that honor both of your visions."
+        
+      - agent: "namer"
+        action: "prepare_generation_strategy"
+        inputs:
+          - "alignment_report"
+          - "shared_constraints"
+        
+  - name: "initial_generation"
+    duration: 600  # 10 minutes
+    actions:
+      - agent: "namer"
+        action: "generate_initial_batch"
+        strategy: "diverse_exploration"
+        parameters:
+          batch_size: 12
+          creativity_level: 0.8
+        outputs:
+          - "name_suggestions_batch_1"
+          
+  - name: "rapid_filtering"
+    duration: 900  # 15 minutes
+    parallel: true
+    actions:
+      - agent: "critic"
+        action: "quick_evaluation"
+        inputs:
+          - "name_suggestions_batch_1"
+        focus:
+          - "domain_availability"
+          - "obvious_issues"
+          - "constraint_compliance"
+        outputs:
+          - "initial_evaluation_results"
+          
+      - agent: "facilitator"
+        action: "present_first_batch"
+        template: "name_gallery_presentation"
+        
+  - name: "founder_reaction_gathering"
+    duration: 1200  # 20 minutes
+    interactive: true
+    actions:
+      - agent: "facilitator"
+        action: "collect_reactions"
+        format: "structured_feedback"
+        dimensions:
+          - "emotional_response"
+          - "practical_concerns"
+          - "directional_preferences"
+          
+      - agent: "namer"
+        action: "analyze_feedback_patterns"
+        real_time: true
+        
+  - name: "iterative_refinement"
+    duration: 1800  # 30 minutes
+    iterations: 3
+    adaptive: true
+    actions:
+      - agent: "namer"
+        action: "refine_based_on_feedback"
+        inputs:
+          - "founder_reactions"
+          - "evaluation_results"
+        strategy: "targeted_improvement"
+        
+      - agent: "critic"
+        action: "evaluate_refined_batch"
+        focus: "detailed_analysis"
+        
+      - agent: "facilitator"
+        action: "moderate_refinement_discussion"
+        keep_energy: "positive"
+        
+  - name: "shortlist_creation"
+    duration: 600  # 10 minutes
+    actions:
+      - agent: "facilitator"
+        action: "collaborative_shortlisting"
+        target_size: 5
+        criteria:
+          - "both_founders_positive"
+          - "no_major_red_flags"
+          - "strategic_fit"
+
+success_criteria:
+  - shortlist_size: "3-7 names"
+  - founder_enthusiasm: ">= 0.7"
+  - feasibility_score: ">= 0.8"
+  - constraint_compliance: "100%"
+
+quality_controls:
+  - real_time_feasibility_checks: true
+  - cultural_sensitivity_screening: true
+  - pronunciation_testing: true
+  - competitive_landscape_awareness: true
+
+failure_recovery:
+  - condition: "no_viable_names"
+    action: "constraint_relaxation_discussion"
+    
+  - condition: "founder_dissatisfaction"
+    action: "creative_breakthrough_session"
+    
+  - condition: "analysis_paralysis"
+    action: "decision_forcing_technique"
+
+outputs:
+  - name: "name_shortlist"
+    destination: "memory/session.json"
+    append: true
+    
+  - name: "generation_history"
+    destination: "memory/session.json"
+    append: true
+    
+  - name: "evaluation_summaries"
+    destination: "memory/session.json"
+    append: true
+
+next_flow: "convergence"
+
+parameters:
+  max_total_names_generated: 50
+  shortlist_target_size: 5
+  quality_threshold: 0.75
+  max_duration: 4500  # 75 minutes

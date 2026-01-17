@@ -1,0 +1,164 @@
+name: "convergence"
+version: "1.0.0"
+description: "Iterative refinement toward final consensus and decision"
+
+triggers:
+  - flow: "naming"
+    completion: "success"
+
+agents:
+  primary: "facilitator"
+  supporting: ["critic", "namer", "synthesizer"]
+
+prerequisites:
+  - shortlist_exists
+  - shortlist_size: ">= 3"
+  - evaluation_data_complete
+
+stages:
+  - name: "deep_dive_evaluation"
+    duration: 1800  # 30 minutes
+    actions:
+      - agent: "critic"
+        action: "comprehensive_analysis"
+        inputs:
+          - "shortlist_names"
+        analysis_depth: "detailed"
+        include:
+          - "trademark_deep_search"
+          - "domain_cost_analysis"
+          - "social_media_availability"
+          - "international_considerations"
+          - "brand_architecture_fit"
+        outputs:
+          - "detailed_evaluations"
+          
+      - agent: "facilitator"
+        action: "present_detailed_analysis"
+        format: "decision_support_dashboard"
+        
+  - name: "structured_discussion"
+    duration: 2100  # 35 minutes
+    methodology: "structured_decision_making"
+    actions:
+      - agent: "facilitator"
+        action: "facilitate_comparison"
+        technique: "pros_cons_analysis"
+        time_per_name: 420  # 7 minutes each for 5 names
+        
+      - agent: "synthesizer"
+        action: "real_time_preference_tracking"
+        
+      - agent: "facilitator"
+        action: "surface_emotional_responses"
+        approach: "gentle_probing"
+        
+  - name: "consensus_building"
+    duration: 1800  # 30 minutes
+    iterations: "until_consensus_or_timeout"
+    consensus_threshold: 0.9
+    actions:
+      - agent: "facilitator"
+        action: "identify_top_contenders"
+        method: "elimination_process"
+        
+      - agent: "facilitator"
+        action: "address_remaining_concerns"
+        style: "solution_focused"
+        
+      - agent: "namer"
+        action: "micro_variations"
+        condition: "close_but_not_quite"
+        
+      - agent: "facilitator"
+        action: "consensus_check"
+        frequency: "every_10_minutes"
+        
+  - name: "final_validation"
+    duration: 900  # 15 minutes
+    actions:
+      - agent: "critic"
+        action: "final_feasibility_check"
+        urgency: "high_priority"
+        
+      - agent: "facilitator"
+        action: "commitment_confirmation"
+        technique: "formal_agreement"
+        
+      - agent: "facilitator"
+        action: "next_steps_guidance"
+
+decision_support_tools:
+  - weighted_scoring_matrix
+  - risk_assessment_dashboard
+  - future_scenario_planning
+  - stakeholder_impact_analysis
+
+consensus_techniques:
+  - pros_and_cons_weighting
+  - emotion_vs_logic_balance
+  - future_self_visualization
+  - rapid_prototyping_exercise
+  - silent_reflection_periods
+
+deadlock_resolution:
+  strategies:
+    - "sleep_on_it_pause"
+    - "external_stakeholder_input"
+    - "compromise_naming_approach"
+    - "multi_name_strategy"
+    - "postpone_decision_protocol"
+    
+  escalation_levels:
+    - level_1: "gentle_nudging"
+    - level_2: "structured_negotiation"
+    - level_3: "creative_alternatives"
+    - level_4: "decision_deferral"
+
+success_criteria:
+  - final_name_selected: true
+  - founder_enthusiasm: ">= 0.85"
+  - commitment_level: ">= 0.9"
+  - feasibility_confirmed: true
+  - next_steps_clear: true
+
+failure_recovery:
+  - condition: "persistent_deadlock"
+    action: "postpone_with_homework"
+    
+  - condition: "buyer_remorse_signals"
+    action: "confidence_building_session"
+    
+  - condition: "new_concerns_emerge"
+    action: "rapid_problem_solving"
+
+outputs:
+  - name: "final_decision"
+    destination: "memory/session.json"
+    append: true
+    format:
+      selected_name: "string"
+      unanimous: "boolean"
+      confidence_level: "number"
+      decision_rationale: "string"
+      next_steps: "array"
+      
+  - name: "session_summary"
+    destination: "memory/session.json"
+    append: true
+    
+  - name: "post_session_recommendations"
+    destination: "memory/session.json"
+    append: true
+
+completion_actions:
+  - "save_final_state"
+  - "generate_session_report"
+  - "prepare_implementation_guide"
+  - "schedule_follow_up"
+
+parameters:
+  max_duration: 5400  # 90 minutes
+  consensus_threshold: 0.9
+  commitment_threshold: 0.85
+  decision_confidence_minimum: 0.8

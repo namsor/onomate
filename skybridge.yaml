@@ -1,0 +1,83 @@
+# Onomate - Startup Naming Assistant
+# A multi-agent system for facilitating startup naming between co-founders
+
+name: "onomate"
+version: "1.0.0"
+description: "AI-powered neutral naming facilitator for startup co-founders"
+
+runtime:
+  environment: "node"
+  version: "18+"
+  
+memory:
+  persistence: true
+  storage: "file"
+  path: "./memory"
+  
+agents:
+  - name: "interviewer"
+    file: "./agents/interviewer.agent.yaml"
+    description: "Gathers individual preferences and constraints from each founder"
+    
+  - name: "synthesizer"
+    file: "./agents/synthesizer.agent.yaml"
+    description: "Identifies commonalities and differences in founder preferences"
+    
+  - name: "namer"
+    file: "./agents/namer.agent.yaml"
+    description: "Generates creative name suggestions based on constraints"
+    
+  - name: "critic"
+    file: "./agents/critic.agent.yaml"
+    description: "Evaluates names for feasibility, legal risks, and market fit"
+    
+  - name: "facilitator"
+    file: "./agents/facilitator.agent.yaml"
+    description: "Manages conversations and guides consensus building"
+
+flows:
+  - name: "intake"
+    file: "./flows/intake.flow.yaml"
+    description: "Initial founder interviews and preference gathering"
+    
+  - name: "alignment"
+    file: "./flows/alignment.flow.yaml"
+    description: "Finding common ground and surfacing differences diplomatically"
+    
+  - name: "naming"
+    file: "./flows/naming.flow.yaml"
+    description: "Name generation and initial filtering"
+    
+  - name: "convergence"
+    file: "./flows/convergence.flow.yaml"
+    description: "Iterative refinement toward final consensus"
+
+api:
+  port: 3001
+  cors: true
+  routes:
+    - path: "/session"
+      methods: ["POST", "GET", "PUT"]
+    - path: "/founders"
+      methods: ["POST", "GET"]
+    - path: "/names"
+      methods: ["GET", "POST"]
+
+ui:
+  framework: "react"
+  port: 3000
+  features:
+    - dual_founder_chat
+    - name_gallery
+    - preference_dashboard
+    - progress_tracking
+
+integrations:
+  domain_check:
+    provider: "namecheap"
+    timeout: 5000
+  trademark_check:
+    provider: "uspto"
+    timeout: 10000
+  social_check:
+    platforms: ["twitter", "instagram", "linkedin"]

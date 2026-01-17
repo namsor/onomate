@@ -1,0 +1,126 @@
+name: "alignment"
+version: "1.0.0"
+description: "Finding common ground and diplomatically surfacing differences"
+
+triggers:
+  - flow: "intake"
+    completion: "success"
+
+agents:
+  primary: "synthesizer"
+  supporting: ["facilitator"]
+
+prerequisites:
+  - founder_a_profile_exists
+  - founder_b_profile_exists
+
+stages:
+  - name: "preference_analysis"
+    duration: 300  # 5 minutes
+    actions:
+      - agent: "synthesizer"
+        action: "analyze_alignment"
+        inputs:
+          - "founder_a_profile"
+          - "founder_b_profile"
+        outputs:
+          - "alignment_report"
+          
+  - name: "present_commonalities"
+    duration: 600  # 10 minutes
+    actions:
+      - agent: "facilitator"
+        action: "highlight_shared_vision"
+        template: "shared_constraints_presentation"
+        inputs:
+          - "alignment_report.shared_constraints"
+        message_type: "positive_reinforcement"
+        
+  - name: "surface_differences"
+    duration: 900  # 15 minutes
+    diplomatic: true
+    actions:
+      - agent: "facilitator"
+        action: "diplomatic_difference_exploration"
+        template: "gentle_conflict_surfacing"
+        inputs:
+          - "alignment_report.conflict_areas"
+        strategy: "reframe_as_opportunities"
+        
+      - agent: "synthesizer"
+        action: "suggest_compromises"
+        condition: "conflicts_identified"
+        
+  - name: "alignment_building"
+    duration: 1200  # 20 minutes
+    iterative: true
+    max_iterations: 3
+    actions:
+      - agent: "facilitator"
+        action: "guide_discussion"
+        focus_areas:
+          - "shared_constraints"
+          - "compromise_opportunities"
+          - "synergy_identification"
+          
+      - agent: "synthesizer"
+        action: "real_time_synthesis"
+        trigger: "founder_input_received"
+        
+  - name: "consensus_check"
+    duration: 300  # 5 minutes
+    actions:
+      - agent: "facilitator"
+        action: "assess_readiness"
+        criteria:
+          - alignment_score: ">= 70"
+          - major_conflicts_resolved: true
+          - both_founders_comfortable: true
+
+success_criteria:
+  - alignment_score: ">= 70"
+  - unresolved_conflicts: "<= 1"
+  - founder_satisfaction: ">= 0.8"
+
+conflict_resolution:
+  strategies:
+    - "reframe_perspective"
+    - "find_middle_ground"
+    - "explore_deeper_needs"
+    - "creative_synthesis"
+    
+  escalation:
+    - level_1: "gentle_probing"
+    - level_2: "structured_negotiation"
+    - level_3: "creative_breakthrough_session"
+    - level_4: "pause_and_reflect"
+
+failure_recovery:
+  - condition: "persistent_conflict"
+    action: "conflict_resolution_protocol"
+    
+  - condition: "low_engagement"
+    action: "motivation_restoration"
+    
+  - condition: "analysis_paralysis"
+    action: "decision_forcing_technique"
+
+outputs:
+  - name: "alignment_report"
+    destination: "memory/shared.json"
+    
+  - name: "resolved_constraints"
+    destination: "memory/session.json"
+    append: true
+    
+  - name: "naming_direction"
+    destination: "memory/session.json"
+    append: true
+
+next_flow: "naming"
+
+parameters:
+  diplomatic_mode: true
+  conflict_sensitivity: 0.8
+  consensus_threshold: 0.7
+  max_duration: 2700  # 45 minutes

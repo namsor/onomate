@@ -1,0 +1,95 @@
+name: "intake"
+version: "1.0.0"
+description: "Initial founder interviews and preference gathering flow"
+
+triggers:
+  - event: "session_start"
+  - event: "new_founder_joined"
+
+agents:
+  primary: "interviewer"
+  supporting: ["facilitator"]
+
+stages:
+  - name: "welcome"
+    duration: 300  # 5 minutes
+    actions:
+      - agent: "facilitator"
+        action: "introduction"
+        message: "Welcome to Onomate! I'll be helping you both find the perfect name for your startup. Let's start by understanding each of your individual preferences."
+        
+  - name: "individual_interviews"
+    duration: 1800  # 30 minutes
+    parallel: true
+    actions:
+      - agent: "interviewer"
+        action: "interview_founder_a"
+        context:
+          founder_role: "founder_a"
+          interview_stage: "initial"
+        outputs:
+          - "founder_a_profile"
+          
+      - agent: "interviewer"  
+        action: "interview_founder_b"
+        context:
+          founder_role: "founder_b"
+          interview_stage: "initial"
+        outputs:
+          - "founder_b_profile"
+          
+  - name: "preference_validation"
+    duration: 600  # 10 minutes
+    actions:
+      - agent: "facilitator"
+        action: "validate_completeness"
+        inputs:
+          - "founder_a_profile"
+          - "founder_b_profile"
+        conditions:
+          - all_required_fields_complete
+        
+      - agent: "interviewer"
+        action: "follow_up_questions"
+        condition: "incomplete_profiles"
+        
+  - name: "intake_summary"
+    duration: 300  # 5 minutes
+    actions:
+      - agent: "facilitator"
+        action: "summarize_intake"
+        message: "Great! I now understand both of your perspectives. Next, we'll analyze where you align and where we might need to find creative compromises."
+
+success_criteria:
+  - both_profiles_complete: true
+  - minimum_constraints_captured: 5
+  - interview_quality_score: ">= 0.8"
+
+failure_recovery:
+  - condition: "timeout"
+    action: "extend_session"
+    max_extensions: 2
+    
+  - condition: "incomplete_profiles"
+    action: "targeted_follow_up"
+    
+  - condition: "founder_disengagement"
+    action: "facilitator_intervention"
+
+outputs:
+  - name: "founder_a_profile"
+    destination: "memory/founder_a.json"
+    
+  - name: "founder_b_profile"  
+    destination: "memory/founder_b.json"
+    
+  - name: "intake_summary"
+    destination: "memory/session.json"
+    append: true
+
+next_flow: "alignment"
+
+parameters:
+  max_duration: 3600  # 1 hour total
+  save_interval: 300   # Save every 5 minutes
+  quality_threshold: 0.7

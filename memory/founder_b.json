@@ -1,0 +1,81 @@
+{
+  "founder_id": "founder_b", 
+  "timestamp": "2024-01-17T10:30:00Z",
+  "interview_status": "complete",
+  "profile": {
+    "business_context": {
+      "industry": "",
+      "domain": "",
+      "target_audience": "",
+      "business_model": "",
+      "geographic_scope": "",
+      "stage": ""
+    },
+    "naming_preferences": {
+      "tone_preferences": {
+        "professional": 0,
+        "playful": 0,
+        "technical": 0,
+        "approachable": 0,
+        "premium": 0,
+        "innovative": 0
+      },
+      "style_preferences": {
+        "descriptive": 0,
+        "abstract": 0,
+        "coined": 0,
+        "compound": 0,
+        "metaphorical": 0
+      },
+      "length_preference": {
+        "preferred_range": "",
+        "max_syllables": 0,
+        "flexibility": ""
+      },
+      "linguistic_preferences": {
+        "language_requirements": [],
+        "international_friendly": false,
+        "avoid_languages": []
+      }
+    },
+    "practical_constraints": {
+      "domain_requirements": {
+        "com_essential": false,
+        "other_tlds_acceptable": [],
+        "budget_range": "",
+        "acquisition_tolerance": ""
+      },
+      "legal_risk_tolerance": {
+        "level": "medium",
+        "trademark_approach": "",
+        "budget_for_legal": ""
+      },
+      "geographic_considerations": {
+        "primary_markets": [],
+        "cultural_sensitivities": [],
+        "regulatory_constraints": []
+      }
+    },
+    "personal_preferences": {
+      "deal_breakers": [],
+      "inspiration_sources": {
+        "admired_names": [],
+        "disliked_names": []
+      },
+      "emotional_goals": [],
+      "future_vision": ""
+    },
+    "confidence_levels": {
+      "business_domain": 0,
+      "target_audience": 0,
+      "tone_preferences": 0,
+      "practical_constraints": 0
+    }
+  },
+  "interview_metadata": {
+    "duration_minutes": 0,
+    "completion_percentage": 0,
+    "follow_up_needed": [],
+    "interviewer_notes": ""
+  }
+}

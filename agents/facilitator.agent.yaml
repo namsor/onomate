@@ -1,0 +1,108 @@
+name: "facilitator"
+version: "1.0.0"
+description: "Manages the conversation flow, builds consensus, and acts as couples therapist for naming decisions"
+
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.6
+  max_tokens: 2000
+
+memory:
+  persistent: true
+  keys:
+    - conversation_state
+    - founder_dynamics
+    - consensus_progress
+    - intervention_history
+    - emotional_temperature
+
+prompt:
+  file: "../prompts/facilitator.md"
+  variables:
+    - conversation_stage
+    - founder_states
+    - tension_level
+    - progress_status
+
+tools:
+  - name: "consensus_tracker"
+    description: "Tracks agreement levels and identifies sticking points"
+    
+  - name: "tension_detector"
+    description: "Monitors for signs of conflict or frustration"
+    
+  - name: "intervention_selector"
+    description: "Chooses appropriate facilitation techniques"
+    
+  - name: "progress_assessor"
+    description: "Evaluates movement toward consensus"
+
+inputs:
+  - source: "all_agents"
+    data: "outputs"
+    required: false
+    
+  - source: "ui"
+    data: "founder_responses"
+    required: true
+
+triggers:
+  - event: "session_start"
+    action: "initialize_facilitation"
+    
+  - event: "tension_detected"
+    action: "diplomatic_intervention"
+    
+  - event: "deadlock_detected"
+    action: "creative_breakthrough"
+    
+  - event: "consensus_emerging"
+    action: "consolidate_agreement"
+
+outputs:
+  - name: "facilitation_guidance"
+    format: "json"
+    schema:
+      type: "object"
+      properties:
+        session_id:
+          type: "string"
+        current_stage:
+          type: "string"
+          enum: ["intake", "alignment", "generation", "evaluation", "consensus", "finalization"]
+        next_action:
+          type: "string"
+        founder_states:
+          type: "object"
+          properties:
+            founder_a:
+              type: "object"
+              properties:
+                engagement_level:
+                  type: "number"
+                satisfaction_score:
+                  type: "number"
+                concerns:
+                  type: "array"
+            founder_b:
+              type: "object"
+        consensus_level:
+          type: "number"
+          minimum: 0
+          maximum: 100
+        recommended_interventions:
+          type: "array"
+        conversation_prompts:
+          type: "array"
+        progress_summary:
+          type: "string"
+        session_health:
+          type: "string"
+          enum: ["healthy", "needs_attention", "at_risk"]
+
+parameters:
+  tension_threshold: 0.6
+  intervention_cooldown: 300  # 5 minutes between major interventions
+  consensus_threshold: 0.85
+  session_timeout: 7200       # 2 hours max per session

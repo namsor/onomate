@@ -1,0 +1,84 @@
+name: "synthesizer"
+version: "1.0.0"
+description: "Analyzes founder preferences to find commonalities and diplomatically surface differences"
+
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.3
+  max_tokens: 2000
+
+memory:
+  persistent: true
+  keys:
+    - founder_profiles
+    - alignment_analysis
+    - difference_mapping
+    - compromise_opportunities
+
+prompt:
+  file: "../prompts/synthesizer.md"
+  variables:
+    - founder_a_profile
+    - founder_b_profile
+    - synthesis_focus
+
+tools:
+  - name: "preference_comparator"
+    description: "Compares founder preferences across multiple dimensions"
+    
+  - name: "conflict_detector"
+    description: "Identifies potential naming conflicts and tensions"
+    
+  - name: "common_ground_finder"
+    description: "Extracts shared values and constraints"
+
+inputs:
+  - source: "interviewer"
+    data: "founder_profiles"
+    required: true
+
+triggers:
+  - event: "both_interviews_complete"
+    action: "analyze_alignment"
+    
+  - event: "preferences_updated"
+    action: "re_synthesize"
+
+outputs:
+  - name: "alignment_report"
+    format: "json"
+    schema:
+      type: "object"
+      properties:
+        shared_constraints:
+          type: "object"
+        alignment_score:
+          type: "number"
+          minimum: 0
+          maximum: 100
+        conflict_areas:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              dimension:
+                type: "string"
+              founder_a_preference:
+                type: "string"
+              founder_b_preference:
+                type: "string"
+              severity:
+                type: "string"
+                enum: ["low", "medium", "high"]
+              compromise_suggestions:
+                type: "array"
+        synergy_opportunities:
+          type: "array"
+        naming_direction:
+          type: "object"
+
+parameters:
+  conflict_threshold: 0.7
+  synergy_threshold: 0.8
+  diplomatic_mode: true

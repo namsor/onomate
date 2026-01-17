@@ -1,0 +1,66 @@
+{
+  "synthesis_timestamp": "2024-01-17T11:00:00Z",
+  "alignment_analysis": {
+    "overall_score": 0,
+    "alignment_areas": {
+      "business_domain": {
+        "aligned": false,
+        "shared_understanding": "",
+        "confidence": 0
+      },
+      "target_audience": {
+        "aligned": false,
+        "shared_profile": {},
+        "differences": []
+      },
+      "tone_preferences": {
+        "shared_preferences": [],
+        "complementary_preferences": [],
+        "conflicting_preferences": []
+      },
+      "practical_constraints": {
+        "shared_constraints": {},
+        "compatible_differences": {},
+        "tension_areas": []
+      }
+    },
+    "conflict_analysis": {
+      "major_conflicts": [],
+      "minor_tensions": [],
+      "philosophical_differences": [],
+      "style_differences": []
+    },
+    "synergy_opportunities": {
+      "complementary_strengths": [],
+      "creative_tensions": [],
+      "unique_combinations": []
+    }
+  },
+  "naming_direction": {
+    "primary_strategy": "",
+    "secondary_strategies": [],
+    "creative_constraints": {
+      "must_haves": [],
+      "nice_to_haves": [],
+      "avoid": []
+    },
+    "success_criteria": {
+      "founder_a_priorities": [],
+      "founder_b_priorities": [],
+      "shared_priorities": []
+    },
+    "generation_parameters": {
+      "style_balance": {},
+      "tone_targets": [],
+      "length_guidelines": {},
+      "domain_strategy": "",
+      "risk_tolerance": ""
+    }
+  },
+  "compromise_framework": {
+    "negotiable_areas": [],
+    "non_negotiable_areas": [],
+    "bridge_strategies": {},
+    "fallback_options": []
+  }
+}

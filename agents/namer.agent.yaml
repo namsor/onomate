@@ -1,0 +1,93 @@
+name: "namer"
+version: "1.0.0"
+description: "Generates creative name suggestions based on synthesized constraints and preferences"
+
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.9
+  max_tokens: 2500
+
+memory:
+  persistent: true
+  keys:
+    - generated_names
+    - naming_strategies
+    - iteration_history
+    - feedback_patterns
+
+prompt:
+  file: "../prompts/namer.md"
+  variables:
+    - shared_constraints
+    - business_domain
+    - creative_direction
+    - iteration_round
+
+tools:
+  - name: "name_generator"
+    description: "Generates names using various linguistic techniques"
+    
+  - name: "semantic_explorer"
+    description: "Explores related concepts and metaphors"
+    
+  - name: "linguistic_analyzer"
+    description: "Analyzes phonetics, morphology, and cultural associations"
+
+inputs:
+  - source: "synthesizer"
+    data: "alignment_report"
+    required: true
+    
+  - source: "critic"
+    data: "feedback"
+    required: false
+
+triggers:
+  - event: "alignment_complete"
+    action: "generate_initial_batch"
+    
+  - event: "feedback_received"
+    action: "refine_suggestions"
+    
+  - event: "request_more_names"
+    action: "generate_variants"
+
+outputs:
+  - name: "name_suggestions"
+    format: "json"
+    schema:
+      type: "object"
+      properties:
+        batch_id:
+          type: "string"
+        iteration:
+          type: "number"
+        names:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              category:
+                type: "string"
+                enum: ["descriptive", "abstract", "compound", "coined", "metaphorical"]
+              rationale:
+                type: "string"
+              confidence_score:
+                type: "number"
+              linguistic_properties:
+                type: "object"
+              target_domains:
+                type: "array"
+        generation_strategy:
+          type: "string"
+        feedback_incorporated:
+          type: "array"
+
+parameters:
+  batch_size: 8
+  max_iterations: 5
+  creativity_balance: 0.7  # Balance between creativity and constraints
+  domain_priority: true

@@ -1,0 +1,72 @@
+name: "interviewer"
+version: "1.0.0"
+description: "Conducts individual interviews to extract naming preferences and constraints"
+
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.7
+  max_tokens: 1500
+
+memory:
+  persistent: true
+  keys:
+    - founder_preferences
+    - extracted_constraints
+    - interview_history
+
+prompt:
+  file: "../prompts/interviewer.md"
+  variables:
+    - founder_role
+    - business_domain
+    - interview_stage
+
+tools:
+  - name: "constraint_extractor"
+    description: "Extracts structured constraints from natural language"
+    
+  - name: "preference_scorer"
+    description: "Scores preference strength on various naming dimensions"
+
+triggers:
+  - event: "founder_joined"
+    action: "start_interview"
+    
+  - event: "incomplete_preferences"
+    action: "follow_up_questions"
+
+outputs:
+  - name: "founder_profile"
+    format: "json"
+    schema:
+      type: "object"
+      properties:
+        founder_id:
+          type: "string"
+        business_domain:
+          type: "string"
+        target_audience:
+          type: "string"
+        tone_preferences:
+          type: "array"
+          items:
+            type: "string"
+        geography:
+          type: "string"
+        legal_risk_tolerance:
+          type: "string"
+          enum: ["low", "medium", "high"]
+        domain_requirements:
+          type: "object"
+        length_preference:
+          type: "string"
+        style_preferences:
+          type: "array"
+        deal_breakers:
+          type: "array"
+
+parameters:
+  max_follow_ups: 3
+  interview_timeout: 1800  # 30 minutes
+  save_interval: 300       # 5 minutes

@@ -1,0 +1,111 @@
+name: "critic"
+version: "1.0.0"
+description: "Evaluates name suggestions for feasibility, legal risks, market fit, and practical concerns"
+
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.2
+  max_tokens: 2000
+
+memory:
+  persistent: true
+  keys:
+    - evaluation_history
+    - risk_assessments
+    - domain_availability
+    - trademark_checks
+
+prompt:
+  file: "../prompts/critic.md"
+  variables:
+    - name_suggestions
+    - evaluation_criteria
+    - risk_tolerance
+
+tools:
+  - name: "domain_checker"
+    description: "Checks domain availability across TLDs"
+    integration: "external_api"
+    
+  - name: "trademark_scanner"
+    description: "Scans trademark databases for conflicts"
+    integration: "external_api"
+    
+  - name: "linguistic_analyzer"
+    description: "Analyzes pronunciation, spelling, and cultural sensitivity"
+    
+  - name: "market_fit_evaluator"
+    description: "Assesses market positioning and competitive landscape"
+
+inputs:
+  - source: "namer"
+    data: "name_suggestions"
+    required: true
+    
+  - source: "synthesizer"
+    data: "shared_constraints"
+    required: true
+
+triggers:
+  - event: "new_names_generated"
+    action: "evaluate_batch"
+    
+  - event: "deep_evaluation_requested"
+    action: "comprehensive_analysis"
+
+outputs:
+  - name: "evaluation_results"
+    format: "json"
+    schema:
+      type: "object"
+      properties:
+        batch_id:
+          type: "string"
+        evaluations:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+              overall_score:
+                type: "number"
+                minimum: 0
+                maximum: 100
+              domain_availability:
+                type: "object"
+                properties:
+                  com_available:
+                    type: "boolean"
+                  alternatives:
+                    type: "array"
+                  cost_estimate:
+                    type: "string"
+              trademark_risk:
+                type: "string"
+                enum: ["low", "medium", "high"]
+              linguistic_concerns:
+                type: "array"
+              market_fit:
+                type: "object"
+              memorability_score:
+                type: "number"
+              pronunciation_difficulty:
+                type: "number"
+              cultural_sensitivity:
+                type: "object"
+              recommendation:
+                type: "string"
+                enum: ["strong_recommend", "recommend", "neutral", "caution", "reject"]
+              detailed_feedback:
+                type: "string"
+
+parameters:
+  domain_check_timeout: 5000
+  trademark_check_timeout: 10000
+  risk_weighting:
+    legal: 0.3
+    linguistic: 0.2
+    market: 0.3
+    technical: 0.2
