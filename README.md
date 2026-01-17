@@ -2,7 +2,7 @@
 
 > **A sophisticated multi-agent system that facilitates neutral naming conversations between co-founders, acting as part naming expert, part couples therapist.**
 
-![Onomate Logo](https://via.placeholder.com/150x50/4F46E5/FFFFFF?text=Onomate)
+![Onomate Logo](47fae89b-07cb-4781-8a14-bcd0197cae2a.png)
 
 Onomate transforms the challenging process of naming a startup from a potential source of founder conflict into a structured, diplomatic, and ultimately successful collaboration.
 
@@ -65,6 +65,9 @@ npm install
 # Configure environment variables
 cp .env.example .env
 # Edit .env with your API keys
+
+# added 
+npx tsc --init
 
 # Build the project
 npm run build

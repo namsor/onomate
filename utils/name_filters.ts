@@ -324,10 +324,11 @@ class NameFilters {
     // Check for alternating consonant/vowel pattern (simplified)
     const vowels = 'aeiou';
     let alternates = true;
-    let lastWasVowel = vowels.includes(name[0].toLowerCase());
+    if (name.length === 0) return false;
+    let lastWasVowel = vowels.includes(name[0]!.toLowerCase());
     
     for (let i = 1; i < name.length; i++) {
-      const isVowel = vowels.includes(name[i].toLowerCase());
+      const isVowel = vowels.includes(name[i]!.toLowerCase());
       if (isVowel === lastWasVowel) {
         alternates = false;
         break;

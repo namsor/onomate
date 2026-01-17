@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Chat.css';
+// import './Chat.css';
 
 interface Message {
   id: string;
@@ -66,7 +66,8 @@ const OnomateChat: React.FC = () => {
           founders: ['founder_a', 'founder_b']
         })
       });
-      const { sessionId, session } = await response.json();
+      const result = await response.json() as { sessionId: string; session: any };
+      const { sessionId, session } = result;
       
       setSessionState({
         session_id: sessionId,
@@ -145,8 +146,11 @@ const OnomateChat: React.FC = () => {
     
     await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
     
-    const response = responses[Math.floor(Math.random() * responses.length)];
-    addSystemMessage(response, 'question');
+    const randomIndex = Math.floor(Math.random() * responses.length);
+    const response = responses[randomIndex];
+    if (response) {
+      addSystemMessage(response, 'question');
+    }
   };
 
   const processNamingMessage = async (message: string, founder: string) => {
@@ -374,7 +378,7 @@ const OnomateChat: React.FC = () => {
           <input
             type="text"
             value={currentMessage}
-            onChange={(e) => setCurrentMessage(e.target.value)}
+            onChange={(e) => setCurrentMessage((e.target as HTMLInputElement).value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
             placeholder={`Type your message as ${currentFounder.replace('_', ' ')}...`}
             disabled={isLoading}

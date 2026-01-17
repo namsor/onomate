@@ -170,14 +170,24 @@ class DomainChecker {
     const isAvailable = Math.random() > 0.6; // 40% chance of availability
     const price = isAvailable ? await this.getDomainPrice(domain) : undefined;
 
-    return {
+    const result: DomainCheckResult = {
       domain,
       available: isAvailable,
-      price: price?.price,
-      registrar: isAvailable ? undefined : 'Mock Registrar',
-      lastChecked: new Date().toISOString(),
-      alternatives: isAvailable ? [] : this.generateAlternatives(domain, 3)
+      lastChecked: new Date().toISOString()
     };
+    
+    if (price?.price !== undefined) {
+      result.price = price.price;
+    }
+    
+    if (!isAvailable) {
+      result.registrar = 'Mock Registrar';
+      result.alternatives = this.generateAlternatives(domain, 3);
+    } else {
+      result.alternatives = [];
+    }
+    
+    return result;
   }
 
   private generateAlternatives(baseName: string, count: number): string[] {
