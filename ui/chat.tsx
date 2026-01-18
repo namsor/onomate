@@ -43,6 +43,7 @@ const OnomateChat: React.FC = () => {
   const [currentFounder, setCurrentFounder] = useState<'founder_a' | 'founder_b'>('founder_a');
   const [isLoading, setIsLoading] = useState(false);
   const [alignmentAnalysisShown, setAlignmentAnalysisShown] = useState(false);
+  const [messageCounter, setMessageCounter] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const apiBase = 'http://localhost:3001';
 
@@ -125,14 +126,22 @@ const OnomateChat: React.FC = () => {
   };
 
   const addSystemMessage = (content: string, type: Message['type'] = 'message') => {
+    // Check if this exact message was just added to prevent duplicates
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.content === content && lastMessage.sender === 'facilitator') {
+      console.log('Duplicate message prevented:', content);
+      return;
+    }
+    
     const newMessage: Message = {
-      id: `msg_${Date.now()}`,
+      id: `msg_${Date.now()}_${messageCounter}`,
       timestamp: new Date().toISOString(),
       sender: 'facilitator',
       content,
       type
     };
     setMessages(prev => [...prev, newMessage]);
+    setMessageCounter(prev => prev + 1);
   };
 
   const saveFounderResponse = async (message: string, founder: string) => {
@@ -448,8 +457,44 @@ const OnomateChat: React.FC = () => {
       }, 2000);
     } else if (lowerMessage.includes('final') || lowerMessage.includes('ready') || lowerMessage.includes('pick')) {
       addSystemMessage("Great! Let's finalize your decision. Based on the feedback so far, which name resonates most strongly with your combined vision?", 'question');
+    } else if (lowerMessage.includes('discuss') || lowerMessage.includes('options') || lowerMessage.includes('compare') || lowerMessage.includes('analyze')) {
+      // Help facilitate discussion of available options
+      await facilitateOptionsDiscussion();
+    } else if (lowerMessage.includes('back') || lowerMessage.includes('previous') || lowerMessage.includes('earlier') || lowerMessage.includes('original')) {
+      addSystemMessage("Would you like me to remind you of your previous strong candidates? Sometimes the first good options are the best ones!", 'question');
     } else {
       addSystemMessage("Thank you for that input. I'm here to help facilitate the final decision between both founders. Feel free to discuss the options or let me know if you need additional suggestions.", 'message');
+    }
+  };
+
+  const facilitateOptionsDiscussion = async () => {
+    addSystemMessage("Let me help facilitate your options discussion...", 'system_update');
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Look for names with positive reactions from both founders
+    const strongCandidates = nameSuggestions.filter(name => {
+      const aReaction = name.founder_reactions?.founder_a;
+      const bReaction = name.founder_reactions?.founder_b;
+      return (aReaction === 'love' || aReaction === 'like') && (bReaction === 'love' || bReaction === 'like');
+    });
+    
+    if (strongCandidates.length > 0) {
+      const candidatesList = strongCandidates.map(name => 
+        `**${name.name}** - ${name.rationale.slice(0, 80)}...`
+      ).join('\n• ');
+      
+      addSystemMessage(`💡 **Your Strong Candidates:**\n• ${candidatesList}\n\nThese names received positive feedback from both founders. Which aspects of these resonate most with each of you?`, 'message');
+      
+      setTimeout(() => {
+        addSystemMessage("Consider: What specific elements of these names appeal to each founder? How do they align with your business goals? Would any of these work as your final choice, or do you need something that combines elements from multiple candidates?", 'question');
+      }, 3000);
+    } else {
+      addSystemMessage("I notice we haven't found strong consensus candidates yet. Let me help identify what each founder values most in the names we've seen so far...", 'message');
+      
+      setTimeout(() => {
+        addSystemMessage("Would you like me to: 1) Generate completely new suggestions with a different approach, 2) Focus on finding compromise solutions, or 3) Help you articulate what you're both looking for?", 'question');
+      }, 2500);
     }
   };
 

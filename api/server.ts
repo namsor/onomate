@@ -286,7 +286,8 @@ class OnomateAPI {
         ...(session.naming_journey.names_generated || []),
         ...newNames.map((name: any) => ({
           ...name,
-          id: `name_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          // Preserve the original ID from the frontend, only generate one if missing
+          id: name.id || `name_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           timestamp: new Date().toISOString()
         }))
       ];
@@ -335,6 +336,8 @@ class OnomateAPI {
         result = await this.analyzeSynthesis(data.founder_a, data.founder_b);
       } else if (agentName === 'namer' && action === 'generate_names') {
         result = await this.generateNames(data.founder_a, data.founder_b, data.constraints);
+      } else if (agentName === 'namer' && action === 'generate_variations') {
+        result = await this.generateVariations(data.founder_a, data.founder_b, data.previous_suggestions, data.constraints);
       } else if (agentName === 'facilitator') {
         result = await this.facilitateConversation(data);
       } else {
@@ -500,6 +503,105 @@ Respond in JSON format:
       
       // If OpenAI fails, throw an error instead of returning hardcoded fallbacks
       throw new Error('AI name generation service temporarily unavailable. Please try again later.');
+    }
+  }
+
+  private async generateVariations(founderA: any, founderB: any, previousSuggestions: any[], constraints: any) {
+    try {
+      console.log('Generating name variations with OpenAI');
+      
+      // Extract context from founder responses
+      const aResponses = founderA?.responses || [];
+      const bResponses = founderB?.responses || [];
+      const aStylePrefs = aResponses[0]?.content || "";
+      const bStylePrefs = bResponses[0]?.content || "";
+      
+      // Create a summary of previous suggestions for context
+      const previousNames = previousSuggestions.map(name => `${name.name} (${name.category})`).join(', ');
+      
+      const prompt = `You are an expert startup naming consultant. Generate 5 NEW name variations and alternatives based on feedback from previous suggestions.
+
+Previous Suggestions That Were Reviewed: ${previousNames}
+
+Founder A Style Preferences: ${aStylePrefs}
+Founder B Style Preferences: ${bStylePrefs}
+
+Requirements for Variations:
+- Create completely NEW names, not variations of the previous ones
+- Address any style conflicts between the founders with creative compromise solutions
+- Include different naming approaches (compound, coined, descriptive, metaphorical)
+- Names should be memorable, brandable, and professional
+- Work internationally and be easy to pronounce
+- Avoid generic tech terms
+
+For each name suggestion, provide:
+1. The name itself
+2. Category (compound/coined/descriptive/metaphorical)
+3. Detailed rationale explaining how it addresses founder preferences and improves on previous feedback
+4. Confidence score (1-100)
+5. Likely domain availability (available/premium/unavailable)
+
+Respond in JSON format:
+{
+  "suggestions": [
+    {
+      "name": "ExampleName",
+      "category": "compound",
+      "rationale": "Detailed explanation of why this variation works...",
+      "confidence_score": 85,
+      "domain_status": "available"
+    }
+  ]
+}`;
+
+      const completion = await this.openai.chat.completions.create({
+        model: process.env.DEFAULT_MODEL || 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert startup naming consultant specializing in creating name variations that address specific founder feedback and preferences. Focus on creative solutions that bridge style differences.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.9, // Higher creativity for variations
+        max_tokens: 1500
+      });
+
+      const responseText = completion.choices[0]?.message?.content;
+      if (!responseText) {
+        throw new Error('No response from OpenAI');
+      }
+
+      // Parse the JSON response
+      const aiResponse = JSON.parse(responseText);
+      
+      if (!aiResponse.suggestions || !Array.isArray(aiResponse.suggestions)) {
+        throw new Error('Invalid variation response format from OpenAI');
+      }
+
+      // Format the variations
+      const formattedVariations = aiResponse.suggestions.map((suggestion: any, index: number) => ({
+        name: suggestion.name || `Variation${index + 1}`,
+        category: suggestion.category || 'compound',
+        rationale: suggestion.rationale || 'AI-generated variation',
+        confidence_score: suggestion.confidence_score || 80,
+        domain_status: suggestion.domain_status || 'unknown'
+      }));
+
+      console.log(`Generated ${formattedVariations.length} name variations via OpenAI`);
+      
+      return {
+        suggestions: formattedVariations,
+        analysis: `Generated ${formattedVariations.length} new variations based on previous feedback`,
+        timestamp: new Date().toISOString()
+      };
+      
+    } catch (error) {
+      console.error('OpenAI variation generation failed:', error);
+      throw new Error('AI variation generation service temporarily unavailable. Please try again later.');
     }
   }
 

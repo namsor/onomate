@@ -1,7 +1,7 @@
 {
   "founder_id": "founder_b",
-  "timestamp": "2026-01-18T14:46:02.651Z",
-  "interview_status": "not_started",
+  "timestamp": "2026-01-18T15:16:21.211Z",
+  "interview_status": "complete",
   "profile": {
     "business_context": {},
     "naming_preferences": {}
@@ -12,5 +12,31 @@
     "follow_up_needed": [],
     "interviewer_notes": ""
   },
-  "responses": []
+  "responses": [
+    {
+      "content": "En tant que co-Foundateur B, j'aime les noms bien franchouillards comme Michelin, Legrand, Carrefour",
+      "timestamp": "2026-01-18T15:15:37.815Z",
+      "question_number": 1
+    },
+    {
+      "content": "Notre société automatise les réservation les plus compliquées par Outlook pour l'hôtellerie",
+      "timestamp": "2026-01-18T15:15:45.102Z",
+      "question_number": 2
+    },
+    {
+      "content": "C'est important, mais notre priorité est la France et le marché francophone",
+      "timestamp": "2026-01-18T15:16:09.392Z",
+      "question_number": 3
+    },
+    {
+      "content": "Flexible, .io, .ai ou .fr sont également valides",
+      "timestamp": "2026-01-18T15:16:15.472Z",
+      "question_number": 4
+    },
+    {
+      "content": "Professionnel, sérieux",
+      "timestamp": "2026-01-18T15:16:21.199Z",
+      "question_number": 5
+    }
+  ]
 }

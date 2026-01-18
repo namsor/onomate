@@ -1,8 +1,34 @@
 {
   "founder_id": "founder_a",
-  "timestamp": "2026-01-18T14:46:02.631Z",
-  "interview_status": "not_started",
-  "responses": [],
+  "timestamp": "2026-01-18T15:15:29.291Z",
+  "interview_status": "complete",
+  "responses": [
+    {
+      "content": "As Founder A, I like English sounding tech names, like Twitter, Windows, Microsoft",
+      "timestamp": "2026-01-18T15:14:48.255Z",
+      "question_number": 1
+    },
+    {
+      "content": "Our startup makes agents to help Hotels in their most complex booking requirements (corporate bookings, events)",
+      "timestamp": "2026-01-18T15:15:08.660Z",
+      "question_number": 2
+    },
+    {
+      "content": "We focus on France, UAE, United States, Europe in general",
+      "timestamp": "2026-01-18T15:15:16.864Z",
+      "question_number": 3
+    },
+    {
+      "content": "Flexible",
+      "timestamp": "2026-01-18T15:15:23.079Z",
+      "question_number": 4
+    },
+    {
+      "content": "innovative",
+      "timestamp": "2026-01-18T15:15:29.287Z",
+      "question_number": 5
+    }
+  ],
   "profile": {
     "business_context": {},
     "naming_preferences": {}
