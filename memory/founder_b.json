@@ -1,76 +1,10 @@
 {
   "founder_id": "founder_b",
-  "timestamp": "2026-01-18T12:18:58.654Z",
+  "timestamp": "2026-01-18T13:48:05.913Z",
   "interview_status": "complete",
   "profile": {
-    "business_context": {
-      "industry": "",
-      "domain": "",
-      "target_audience": "",
-      "business_model": "",
-      "geographic_scope": "",
-      "stage": ""
-    },
-    "naming_preferences": {
-      "tone_preferences": {
-        "professional": 0,
-        "playful": 0,
-        "technical": 0,
-        "approachable": 0,
-        "premium": 0,
-        "innovative": 0
-      },
-      "style_preferences": {
-        "descriptive": 0,
-        "abstract": 0,
-        "coined": 0,
-        "compound": 0,
-        "metaphorical": 0
-      },
-      "length_preference": {
-        "preferred_range": "",
-        "max_syllables": 0,
-        "flexibility": ""
-      },
-      "linguistic_preferences": {
-        "language_requirements": [],
-        "international_friendly": false,
-        "avoid_languages": []
-      }
-    },
-    "practical_constraints": {
-      "domain_requirements": {
-        "com_essential": false,
-        "other_tlds_acceptable": [],
-        "budget_range": "",
-        "acquisition_tolerance": ""
-      },
-      "legal_risk_tolerance": {
-        "level": "medium",
-        "trademark_approach": "",
-        "budget_for_legal": ""
-      },
-      "geographic_considerations": {
-        "primary_markets": [],
-        "cultural_sensitivities": [],
-        "regulatory_constraints": []
-      }
-    },
-    "personal_preferences": {
-      "deal_breakers": [],
-      "inspiration_sources": {
-        "admired_names": [],
-        "disliked_names": []
-      },
-      "emotional_goals": [],
-      "future_vision": ""
-    },
-    "confidence_levels": {
-      "business_domain": 0,
-      "target_audience": 0,
-      "tone_preferences": 0,
-      "practical_constraints": 0
-    }
+    "business_context": {},
+    "naming_preferences": {}
   },
   "interview_metadata": {
     "duration_minutes": 0,
@@ -80,39 +14,29 @@
   },
   "responses": [
     {
-      "content": "ok",
-      "timestamp": "2026-01-18T12:06:45.119Z",
+      "content": "Moi j'aime les noms bien franchouillards comme : Michelin, Legrand, Atos",
+      "timestamp": "2026-01-18T13:47:37.371Z",
       "question_number": 1
     },
     {
-      "content": "Notre société automatise la préparation de présentation commerciales Powerpoint, nous visons les industries taditionnelles de l'industrie, du bâtiment",
-      "timestamp": "2026-01-18T12:08:10.329Z",
+      "content": "La communauté de développeurs Minecraft",
+      "timestamp": "2026-01-18T13:47:46.138Z",
       "question_number": 2
     },
     {
-      "content": "C'est important, mais notre priorité est la France et le marché francophone",
-      "timestamp": "2026-01-18T12:17:09.288Z",
+      "content": "Important",
+      "timestamp": "2026-01-18T13:47:51.931Z",
       "question_number": 3
     },
     {
-      "content": "Felxible, .io, .ai ou .fr sont également valides",
-      "timestamp": "2026-01-18T12:17:26.788Z",
+      "content": "Flexible",
+      "timestamp": "2026-01-18T13:47:58.785Z",
       "question_number": 4
     },
     {
-      "content": "Professionnel, sérieux",
-      "timestamp": "2026-01-18T12:17:43.285Z",
+      "content": "innovateur",
+      "timestamp": "2026-01-18T13:48:05.905Z",
       "question_number": 5
-    },
-    {
-      "content": "Ok; What is the question? ",
-      "timestamp": "2026-01-18T12:18:29.277Z",
-      "question_number": 6
-    },
-    {
-      "content": "Ok; What is the question?",
-      "timestamp": "2026-01-18T12:18:58.647Z",
-      "question_number": 7
     }
   ]
 }

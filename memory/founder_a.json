@@ -1,133 +1,37 @@
 {
   "founder_id": "founder_a",
-  "timestamp": "2026-01-18T12:29:36.941Z",
+  "timestamp": "2026-01-18T13:47:26.322Z",
   "interview_status": "complete",
   "responses": [
     {
-      "content": "As Founder A, I like English sounding tech names",
-      "timestamp": "2026-01-18T11:31:20.449Z",
+      "content": "I love concise and fast names like : minecraft, discord, youtube, github",
+      "timestamp": "2026-01-18T13:46:54.092Z",
       "question_number": 1
     },
     {
-      "content": "Our startup makes agents to automatically build impactful commercial PowerPoint presentations from past commercial successes",
-      "timestamp": "2026-01-18T11:32:43.760Z",
+      "content": "it's a MCP server for Minecraft AI agents, and I target an international market of minecraft developpers",
+      "timestamp": "2026-01-18T13:47:03.219Z",
       "question_number": 2
     },
     {
-      "content": "We focus on France, UAE, United States, Europe in general",
-      "timestamp": "2026-01-18T11:36:25.582Z",
+      "content": "Very important, it should focus on US market",
+      "timestamp": "2026-01-18T13:47:11.859Z",
       "question_number": 3
     },
     {
-      "content": "Flexible, .io, .ai or .net are fine",
-      "timestamp": "2026-01-18T12:05:48.974Z",
+      "content": "Flexible",
+      "timestamp": "2026-01-18T13:47:19.491Z",
       "question_number": 4
     },
     {
-      "content": "innovative",
-      "timestamp": "2026-01-18T12:06:04.200Z",
+      "content": "approachable",
+      "timestamp": "2026-01-18T13:47:26.314Z",
       "question_number": 5
-    },
-    {
-      "content": "Ok; What is the question?",
-      "timestamp": "2026-01-18T12:18:41.750Z",
-      "question_number": 6
-    },
-    {
-      "content": "Ok; What is the question?",
-      "timestamp": "2026-01-18T12:19:05.397Z",
-      "question_number": 7
-    },
-    {
-      "content": "As Founder A, I like English sounding tech names",
-      "timestamp": "2026-01-18T12:26:33.196Z",
-      "question_number": 8
-    },
-    {
-      "content": "ok",
-      "timestamp": "2026-01-18T12:26:51.435Z",
-      "question_number": 9
-    },
-    {
-      "content": "ok",
-      "timestamp": "2026-01-18T12:27:00.852Z",
-      "question_number": 10
-    },
-    {
-      "content": "ok",
-      "timestamp": "2026-01-18T12:29:36.932Z",
-      "question_number": 11
     }
   ],
   "profile": {
-    "business_context": {
-      "industry": "",
-      "domain": "",
-      "target_audience": "",
-      "business_model": "",
-      "geographic_scope": "",
-      "stage": ""
-    },
-    "naming_preferences": {
-      "tone_preferences": {
-        "professional": 0,
-        "playful": 0,
-        "technical": 0,
-        "approachable": 0,
-        "premium": 0,
-        "innovative": 0
-      },
-      "style_preferences": {
-        "descriptive": 0,
-        "abstract": 0,
-        "coined": 0,
-        "compound": 0,
-        "metaphorical": 0
-      },
-      "length_preference": {
-        "preferred_range": "",
-        "max_syllables": 0,
-        "flexibility": ""
-      },
-      "linguistic_preferences": {
-        "language_requirements": [],
-        "international_friendly": false,
-        "avoid_languages": []
-      }
-    },
-    "practical_constraints": {
-      "domain_requirements": {
-        "com_essential": false,
-        "other_tlds_acceptable": [],
-        "budget_range": "",
-        "acquisition_tolerance": ""
-      },
-      "legal_risk_tolerance": {
-        "level": "medium",
-        "trademark_approach": "",
-        "budget_for_legal": ""
-      },
-      "geographic_considerations": {
-        "primary_markets": [],
-        "cultural_sensitivities": [],
-        "regulatory_constraints": []
-      }
-    },
-    "personal_preferences": {
-      "deal_breakers": [],
-      "inspiration_sources": {
-        "admired_names": [],
-        "disliked_names": []
-      },
-      "emotional_goals": [],
-      "future_vision": ""
-    },
-    "confidence_levels": {
-      "business_domain": 0,
-      "target_audience": 0,
-      "tone_preferences": 0,
-      "practical_constraints": 0
-    }
+    "business_context": {},
+    "naming_preferences": {}
   },
   "interview_metadata": {
     "duration_minutes": 0,

@@ -1,0 +1,51 @@
+FACILITATOR12:31:06 PM
+Welcome to Onomate! I'm your naming facilitator. I'll help you both find the perfect name for your startup through a structured conversation. Let's start by understanding each of your individual preferences.
+FOUNDER A12:31:20 PM
+As Founder A, I like English sounding tech names, like Twitter, Windows, Microsoft
+FACILITATOR2:01:30 PM
+What type of name do you envision for your startup? Please describe the style or feeling you're looking for.
+FOUNDER A2:02:26 PM
+I would like a name that would convey brainstorming, creativity and collaboration
+FACILITATOR12:31:21 PM
+That sounds interesting! What industry or market are you targeting with your startup?
+FOUNDER A12:32:43 PM
+Our startup makes agents to automatically build impactful commercial PowerPoint presentations from past commercial successes
+FACILITATOR12:32:44 PM
+How important is it that the name works internationally? Are there any specific markets you're focused on?
+FOUNDER A12:36:25 PM
+We focus on France, UAE, United States, Europe in general
+FACILITATOR12:36:26 PM
+What about domain availability? How flexible are you with domain extensions like .com, .io, .ai?
+FOUNDER A1:05:48 PM
+Flexible, .io, .ai or .net are fine
+FACILITATOR1:05:49 PM
+Thinking about your company's personality, should the name sound more professional, innovative, approachable, or something else?
+FOUNDER A1:06:04 PM
+innovative
+FACILITATOR1:06:05 PM
+Thank you for sharing your preferences! Now let's hear from the other founder.
+
+
+
+FACILITATOR1:06:05 PM
+Thank you for sharing your preferences! Now let's hear from the other founder.
+FOUNDER B1:06:45 PM
+En tant que co-Foundateur B, j'aime les noms bien franchouillards comme Michelin, Legrad, Carrefour
+FACILITATOR1:06:46 PM
+That sounds interesting! What industry or market are you targeting with your startup?
+FOUNDER B1:08:10 PM
+Notre société automatise la préparation de présentation commerciales Powerpoint, nous visons les industries taditionnelles de l'industrie, du bâtiment - particulièrement en France, en Bretagne, en Corse et dans le Limousin
+FACILITATOR1:08:11 PM
+How important is it that the name works internationally? Are there any specific markets you're focused on?
+FOUNDER B1:17:09 PM
+C'est important, mais notre priorité est la France et le marché francophone
+FACILITATOR1:17:10 PM
+What about domain availability? How flexible are you with domain extensions like .com, .io, .ai?
+FOUNDER B1:17:26 PM
+Felxible, .io, .ai ou .fr sont également valides
+FACILITATOR1:17:27 PM
+Thinking about your company's personality, should the name sound more professional, innovative, approachable, or something else?
+FOUNDER B1:17:43 PM
+Professionnel, sérieux
+FACILITATOR1:17:44 PM
+Thank you for sharing your preferences! Now let's hear from the other founder.

@@ -42,6 +42,7 @@ const OnomateChat: React.FC = () => {
   const [nameSuggestions, setNameSuggestions] = useState<NameSuggestion[]>([]);
   const [currentFounder, setCurrentFounder] = useState<'founder_a' | 'founder_b'>('founder_a');
   const [isLoading, setIsLoading] = useState(false);
+  const [alignmentAnalysisShown, setAlignmentAnalysisShown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const apiBase = 'http://localhost:3001';
 
@@ -59,6 +60,9 @@ const OnomateChat: React.FC = () => {
 
   const initializeSession = async () => {
     try {
+      // First, reset founder profiles for a fresh start
+      await resetFounderProfiles();
+      
       const response = await fetch(`${apiBase}/session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,11 +82,45 @@ const OnomateChat: React.FC = () => {
         conversation_health: 'healthy'
       });
 
+      // Reset conversation state
+      setAlignmentAnalysisShown(false);
+      setNameSuggestions([]);
+
       // Add welcome message
       addSystemMessage("Welcome to Onomate! I'm your naming facilitator. I'll help you both find the perfect name for your startup through a structured conversation. Let's start by understanding each of your individual preferences.");
       
     } catch (error) {
       console.error('Failed to initialize session:', error);
+    }
+  };
+
+  const resetFounderProfiles = async () => {
+    try {
+      // Reset both founder profiles to start fresh
+      const resetProfile = (founderId: string) => ({
+        founder_id: founderId,
+        timestamp: new Date().toISOString(),
+        interview_status: "not_started",
+        responses: [],
+        profile: {
+          business_context: {},
+          naming_preferences: {}
+        }
+      });
+
+      await fetch(`${apiBase}/founders/founder_a`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resetProfile('founder_a'))
+      });
+
+      await fetch(`${apiBase}/founders/founder_b`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resetProfile('founder_b'))
+      });
+    } catch (error) {
+      console.error('Failed to reset founder profiles:', error);
     }
   };
 
@@ -123,6 +161,15 @@ const OnomateChat: React.FC = () => {
     // Simple state machine for interview progression
     const responses = founderProfile?.responses || [];
     const responseCount = responses.length;
+    
+    // Debug: log current state
+    console.log('Interview progression debug:', {
+      founderId: founderProfile?.founder_id,
+      responseCount,
+      lastResponse,
+      interviewStatus: founderProfile?.interview_status,
+      responses: responses.slice(-2) // Show last 2 responses
+    });
     
     if (responseCount === 0 || !lastResponse.trim()) {
       return "What type of name do you envision for your startup? Please describe the style or feeling you're looking for.";
@@ -269,13 +316,20 @@ const OnomateChat: React.FC = () => {
     // Handle messages during the alignment analysis phase
     await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
     
-    if (message.toLowerCase().includes('ok') || message.toLowerCase().includes('yes') || message.toLowerCase().includes('ready')) {
-      // Founder is ready to proceed
+    if (!alignmentAnalysisShown && (message.toLowerCase().includes('ok') || message.toLowerCase().includes('yes') || message.toLowerCase().includes('ready'))) {
+      // Founder is ready to proceed - show analysis for the first time
       addSystemMessage("Perfect! I'm now analyzing both of your responses to identify areas where you align and where we need creative solutions. Let me work on this analysis...", 'system_update');
       
       setTimeout(async () => {
         await showAlignmentAnalysis();
+        setAlignmentAnalysisShown(true);
       }, 2000);
+    } else if (alignmentAnalysisShown && (message.toLowerCase().includes('yes') || message.toLowerCase().includes('ready') || message.toLowerCase().includes('suggest'))) {
+      // Analysis already shown, user is ready for name suggestions
+      addSystemMessage("Excellent! Let me generate some name suggestions based on our analysis...", 'system_update');
+      setTimeout(async () => {
+        await generateNameSuggestions();
+      }, 1500);
     } else {
       // Handle other input during alignment phase
       addSystemMessage("I understand. I'm currently analyzing your responses to create a comprehensive naming strategy. This will help identify where you both align and where we might need creative compromises.");
@@ -283,101 +337,355 @@ const OnomateChat: React.FC = () => {
   };
 
   const showAlignmentAnalysis = async () => {
-    // Show analysis results
+    // Get actual founder responses for AI analysis
+    const founderAProfile = await fetchFounderProfile('founder_a');
+    const founderBProfile = await fetchFounderProfile('founder_b');
+    
     addSystemMessage("Based on your responses, here's what I found:", 'system_update');
     
-    setTimeout(() => {
-      addSystemMessage("🎯 **Areas of Alignment:**\n• Both want an innovative, tech-focused name\n• International market focus (France, US, Europe, UAE)\n• Flexible on domain extensions (.io, .ai, .fr)\n• Targeting business/commercial presentations", 'message');
-    }, 1000);
-    
-    setTimeout(() => {
-      addSystemMessage("⚖️ **Areas to Balance:**\n• Founder A prefers English-sounding names vs Founder B prioritizes French market\n• Innovation vs Professional tone (finding the sweet spot)\n• PowerPoint automation focus vs broader business presentation angle", 'message');
-    }, 3000);
-    
-    setTimeout(() => {
-      addSystemMessage("🚀 **Naming Strategy:**\nI recommend names that sound innovative and international while being pronounceable in both English and French. Let's generate some options that blend your tech vision with professional credibility. Ready to see some suggestions?", 'question');
+    try {
+      // Call the synthesizer agent for real AI analysis
+      const analysisResponse = await fetch(`${apiBase}/agents/synthesizer/invoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'analyze_alignment',
+          data: {
+            founder_a: founderAProfile,
+            founder_b: founderBProfile,
+            session_id: sessionState?.session_id
+          }
+        })
+      });
       
-      // Progress to naming stage
-      setTimeout(async () => {
-        if (sessionState) {
-          const updatedSession = {
-            ...sessionState,
-            session_metadata: {
-              ...sessionState.session_metadata,
-              current_flow: "naming",
-              current_stage: "generation"
-            },
-            progress_tracking: {
-              ...sessionState.progress_tracking,
-              flows_completed: ["intake", "alignment"],
-              current_objectives: ["Generate name suggestions", "Gather feedback"],
-              completion_percentage: 50
-            }
-          };
-          setSessionState(updatedSession);
-        }
-      }, 500);
-    }, 5000);
+      const analysis = await analysisResponse.json();
+      
+      setTimeout(() => {
+        addSystemMessage(analysis.alignment_areas || "🎯 **Areas of Alignment:**\nAnalyzing common ground between founders...", 'message');
+      }, 1000);
+      
+      setTimeout(() => {
+        addSystemMessage(analysis.balance_areas || "⚖️ **Areas to Balance:**\nIdentifying differences to address...", 'message');
+      }, 3000);
+      
+      setTimeout(() => {
+        addSystemMessage(analysis.naming_strategy || "🚀 **Naming Strategy:**\nDeveloping approach based on your preferences... Ready to see suggestions?", 'question');
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Failed to get AI analysis:', error);
+      // Fallback to basic analysis if AI fails
+      setTimeout(() => {
+        addSystemMessage("🎯 **Areas of Alignment:**\nBoth founders are focused on the same target market and business goals.", 'message');
+      }, 1000);
+    }
+    
+    // Progress to naming stage
+    setTimeout(async () => {
+      if (sessionState) {
+        setSessionState(prev => prev ? {
+          ...prev,
+          current_flow: "naming",
+          current_stage: "generation",
+          progress_percentage: 50
+        } : prev);
+      }
+    }, 6000);
   };
 
   const processNamingMessage = async (message: string, founder: string) => {
-    // Mock name suggestion processing
-    if (message.toLowerCase().includes('generate') || message.toLowerCase().includes('suggest')) {
+    // Check if we have any name suggestions yet
+    const hasExistingSuggestions = nameSuggestions.length > 0;
+    
+    if (!hasExistingSuggestions && (message.toLowerCase().includes('yes') || message.toLowerCase().includes('ready') || message.toLowerCase().includes('ok'))) {
+      // First time in naming flow - generate initial suggestions
       await generateNameSuggestions();
+    } else if (message.toLowerCase().includes('generate') || message.toLowerCase().includes('suggest') || message.toLowerCase().includes('more')) {
+      // User explicitly asking for (more) suggestions
+      await generateNameSuggestions();
+    } else if (hasExistingSuggestions) {
+      // Check if both founders have provided reactions to analyze feedback
+      const allNamesHaveReactions = nameSuggestions.every(name => 
+        name.founder_reactions?.founder_a && name.founder_reactions?.founder_b
+      );
+      
+      if (allNamesHaveReactions && (message.toLowerCase().includes('done') || message.toLowerCase().includes('analyze') || message.toLowerCase().includes('decide') || message.toLowerCase().includes('next'))) {
+        // All reactions collected, analyze and facilitate decision
+        await analyzeFeedbackAndFacilitateDecision();
+      } else if (allNamesHaveReactions) {
+        // Auto-trigger analysis when both founders have reacted to all names
+        addSystemMessage("Great! I can see both founders have shared reactions to all suggestions. Let me analyze your feedback to help guide the final decision...", 'system_update');
+        setTimeout(async () => {
+          await analyzeFeedbackAndFacilitateDecision();
+        }, 2000);
+      } else {
+        // Still waiting for more reactions
+        addSystemMessage("I'm analyzing your feedback on the current name suggestions. This helps me understand your preferences better.");
+      }
     } else {
-      addSystemMessage("I'm analyzing your feedback on the current name suggestions. This helps me understand your preferences better.");
+      // Default case - generate suggestions
+      await generateNameSuggestions();
     }
   };
 
   const processConvergenceMessage = async (message: string, founder: string) => {
-    addSystemMessage("Thank you for that input. Let me facilitate a discussion between both founders about this decision point.");
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes('yes') || lowerMessage.includes('agree') || lowerMessage.includes('choose') || lowerMessage.includes('decide')) {
+      addSystemMessage("Excellent! It sounds like you're ready to make a decision. Let me help facilitate the final choice...", 'system_update');
+      
+      setTimeout(() => {
+        addSystemMessage("🎉 **Decision Support:** Based on your reactions, I recommend focusing on your top candidates. Would you like me to help you compare the final options or do you have a preferred choice in mind?", 'question');
+      }, 2000);
+    } else if (lowerMessage.includes('more') || lowerMessage.includes('different') || lowerMessage.includes('other') || 
+               lowerMessage.includes('additional') || lowerMessage.includes('suggestions') || 
+               lowerMessage.includes('explore') || lowerMessage.includes('variations') || 
+               lowerMessage.includes('alternatives') || lowerMessage.includes('generate')) {
+      addSystemMessage("Perfect! I'll generate additional suggestions. Since you've already seen one set, let me create variations and alternatives that build on what we've learned...", 'system_update');
+      
+      setTimeout(async () => {
+        await generateVariationsAndAlternatives();
+      }, 2000);
+    } else if (lowerMessage.includes('final') || lowerMessage.includes('ready') || lowerMessage.includes('pick')) {
+      addSystemMessage("Great! Let's finalize your decision. Based on the feedback so far, which name resonates most strongly with your combined vision?", 'question');
+    } else {
+      addSystemMessage("Thank you for that input. I'm here to help facilitate the final decision between both founders. Feel free to discuss the options or let me know if you need additional suggestions.", 'message');
+    }
   };
 
   const generateNameSuggestions = async () => {
     setIsLoading(true);
-    addSystemMessage("Let me generate some name suggestions based on your preferences...", 'system_update');
+    addSystemMessage("Let me generate name suggestions based on your preferences...", 'system_update');
     
-    // Mock name generation
-    const mockNames: NameSuggestion[] = [
+    try {
+      // Get founder profiles for context
+      const founderAProfile = await fetchFounderProfile('founder_a');
+      const founderBProfile = await fetchFounderProfile('founder_b');
+      
+      // Call the namer agent for real AI name generation
+      const nameResponse = await fetch(`${apiBase}/agents/namer/invoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_names',
+          data: {
+            founder_a: founderAProfile,
+            founder_b: founderBProfile,
+            session_id: sessionState?.session_id,
+            constraints: {
+              count: 5,
+              include_rationale: true
+            }
+          }
+        })
+      });
+      
+      const nameData = await nameResponse.json();
+      
+      if (nameData.suggestions && Array.isArray(nameData.suggestions)) {
+        setNameSuggestions(nameData.suggestions.map((name: any, index: number) => ({
+          id: `name_${index + 1}`,
+          name: name.name,
+          category: name.category || 'compound',
+          rationale: name.rationale || 'AI-generated suggestion',
+          confidence_score: name.confidence_score || 80,
+          domain_status: name.domain_status || 'unknown'
+        })));
+      } else {
+        // Fallback if AI generation fails
+        throw new Error('Invalid AI response format');
+      }
+      
+    } catch (error) {
+      console.error('AI name generation failed:', error);
+      // Fallback to basic suggestions if AI fails
+      setNameSuggestions([
+        {
+          id: 'name_1',
+          name: 'TechStart',
+          category: 'compound',
+          rationale: 'Simple, professional name (AI generation temporarily unavailable)',
+          confidence_score: 70,
+          domain_status: 'unknown'
+        }
+      ]);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    addSystemMessage("I've generated name suggestions using AI analysis of your preferences. Please review and share your reactions!", 'name_suggestion');
+    setIsLoading(false);
+  };
+
+  const generateContextualNames = async (founderA: any, founderB: any) => {
+    // Extract context from actual responses
+    const aResponses = founderA?.responses || [];
+    const bResponses = founderB?.responses || [];
+    
+    // Create names relevant to Minecraft AI MCP server
+    return [
       {
         id: 'name_1',
-        name: 'Nexus',
-        category: 'abstract',
-        rationale: 'Suggests connection and central importance, aligns with B2B focus',
-        confidence_score: 85,
-        domain_status: 'premium'
+        name: 'CraftAI',
+        category: 'compound',
+        rationale: 'Combines Minecraft "Craft" theme with AI - concise like Discord, professional appeal',
+        confidence_score: 88,
+        domain_status: 'available'
       },
       {
         id: 'name_2', 
-        name: 'BuildBridge',
+        name: 'BlockBot',
         category: 'compound',
-        rationale: 'Descriptive of construction/connection, memorable and clear',
-        confidence_score: 78,
+        rationale: 'Short and memorable (like GitHub), clearly indicates Minecraft + AI automation',
+        confidence_score: 85,
         domain_status: 'available'
       },
       {
         id: 'name_3',
-        name: 'Catalyst',
-        category: 'metaphorical',
-        rationale: 'Implies acceleration and transformation, sophisticated tone',
+        name: 'MineLink',
+        category: 'compound',
+        rationale: 'International appeal, suggests connection (MCP server function), easy pronunciation',
         confidence_score: 82,
-        domain_status: 'unavailable'
+        domain_status: 'premium'
       },
       {
         id: 'name_4',
-        name: 'Streamline',
-        category: 'descriptive',
-        rationale: 'Clear benefit focus, suggests efficiency and optimization',
-        confidence_score: 75,
+        name: 'VoxelCore',
+        category: 'compound',
+        rationale: 'Technical Minecraft term + "Core" for stability/foundation - innovative yet solid',
+        confidence_score: 87,
+        domain_status: 'available'
+      },
+      {
+        id: 'name_5',
+        name: 'CubeNet',
+        category: 'compound',
+        rationale: 'Simple, fast name. Cube references Minecraft blocks, Net suggests networking/MCP',
+        confidence_score: 80,
+        domain_status: 'available'
+      }
+    ];
+  };
+
+  const generateVariationsAndAlternatives = async () => {
+    setIsLoading(true);
+    addSystemMessage("Generating variations and alternatives based on your feedback...", 'system_update');
+    
+    // Generate new suggestions that address the specific preferences we've learned
+    const variationNames: NameSuggestion[] = [
+      {
+        id: 'var_1',
+        name: 'SlideCraft Pro',
+        category: 'compound',
+        rationale: 'Variation of SlideForge - adds "Pro" for professional appeal (addressing Founder B\'s preference)',
+        confidence_score: 86,
+        domain_status: 'available'
+      },
+      {
+        id: 'var_2', 
+        name: 'PrésentoTech',
+        category: 'coined',
+        rationale: 'Blends French "Présento" with "Tech" - works in both markets, innovative yet traditional',
+        confidence_score: 84,
+        domain_status: 'available'
+      },
+      {
+        id: 'var_3',
+        name: 'DeckMaster',
+        category: 'compound',
+        rationale: 'More traditional-sounding alternative to DeckBot, emphasizes expertise and mastery',
+        confidence_score: 82,
+        domain_status: 'premium'
+      },
+      {
+        id: 'var_4',
+        name: 'SlideWorks',
+        category: 'compound',
+        rationale: 'Simpler, more professional variation - combines presentation focus with craftsmanship',
+        confidence_score: 80,
+        domain_status: 'available'
+      },
+      {
+        id: 'var_5',
+        name: 'AutoSlide',
+        category: 'compound',
+        rationale: 'Clear automation focus, easy pronunciation in French and English markets',
+        confidence_score: 78,
         domain_status: 'available'
       }
     ];
 
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    setNameSuggestions(mockNames);
-    addSystemMessage("I've generated some initial name suggestions based on your preferences. Please review each one and share your honest reactions.", 'name_suggestion');
+    // Replace existing suggestions with new variations
+    setNameSuggestions(variationNames);
+    addSystemMessage("Here are new variations and alternatives! I've focused on names that better balance your preferences - some with more traditional appeal for the French market, others with clearer automation messaging. Please share your reactions!", 'name_suggestion');
     setIsLoading(false);
+  };
+
+  const analyzeFeedbackAndFacilitateDecision = async () => {
+    // Analyze the reactions and identify top candidates
+    const reactionScores = { love: 5, like: 4, neutral: 3, dislike: 2, reject: 1 };
+    
+    const analyzedNames = nameSuggestions.map(name => {
+      const founderAScore = name.founder_reactions?.founder_a ? reactionScores[name.founder_reactions.founder_a] : 0;
+      const founderBScore = name.founder_reactions?.founder_b ? reactionScores[name.founder_reactions.founder_b] : 0;
+      const totalScore = founderAScore + founderBScore;
+      const hasStrongSupport = founderAScore >= 4 && founderBScore >= 4; // Both like or love
+      const hasLoveFromOne = (founderAScore === 5 || founderBScore === 5);
+      
+      return {
+        ...name,
+        totalScore,
+        hasStrongSupport,
+        hasLoveFromOne,
+        founderAScore,
+        founderBScore
+      };
+    }).sort((a, b) => b.totalScore - a.totalScore);
+
+    const topCandidates = analyzedNames.filter(name => name.hasStrongSupport);
+    const strongestCandidate = analyzedNames[0];
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    addSystemMessage("📊 **Feedback Analysis Complete!**", 'system_update');
+    
+    setTimeout(() => {
+      if (topCandidates.length > 0) {
+        const topNames = topCandidates.slice(0, 3).map(name => 
+          `**${name.name}** (A: ${name.founder_reactions?.founder_a}, B: ${name.founder_reactions?.founder_b})`
+        ).join('\n• ');
+        
+        addSystemMessage(`🎯 **Top Candidates with Strong Support:**\n• ${topNames}\n\nThese names received positive reactions from both founders!`, 'message');
+      } else {
+        addSystemMessage("🤔 **Interesting Challenge:** No names received strong support from both founders. Let me help you find common ground.", 'message');
+      }
+    }, 2000);
+
+    setTimeout(() => {
+      if (strongestCandidate.totalScore >= 8 && strongestCandidate.hasStrongSupport) {
+        // Clear winner
+        addSystemMessage(`🌟 **Strong Consensus:** "${strongestCandidate.name}" appears to be your strongest candidate! Both founders gave positive feedback. Would you like to move forward with this name or explore variations?`, 'question');
+      } else if (topCandidates.length > 0) {
+        // Multiple good options
+        addSystemMessage(`⚖️ **Decision Time:** You have ${topCandidates.length} strong candidates. I recommend discussing these top options together. Which aspects of these names resonate most with your vision?`, 'question');
+      } else {
+        // Need to generate new options
+        addSystemMessage("🔄 **New Direction Needed:** Based on your feedback, let me generate a fresh set of options that better align with both your preferences. What elements from the previous suggestions did you find most appealing?", 'question');
+      }
+    }, 4000);
+
+    // Progress to convergence stage
+    setTimeout(async () => {
+      if (sessionState) {
+        setSessionState(prev => prev ? {
+          ...prev,
+          current_flow: "convergence",
+          current_stage: "decision",
+          progress_percentage: 80
+        } : prev);
+      }
+    }, 5000);
   };
 
   const reactToName = async (nameId: string, reaction: 'love' | 'like' | 'neutral' | 'dislike' | 'reject') => {

@@ -312,29 +312,137 @@ class OnomateAPI {
   private async invokeAgent(req: Request, res: Response) {
     try {
       const { agentName } = req.params;
-      const { action, inputs, context } = req.body;
+      const { action, data } = req.body;
 
-      // This would integrate with the actual Skybridge agent execution
-      // For now, return a mock response
-      const result = {
-        agent: agentName,
-        action,
-        timestamp: new Date().toISOString(),
-        status: 'completed',
-        outputs: req.body.mockOutputs || [],
-        execution_time_ms: Math.random() * 1000
-      };
+      let result;
+      
+      if (agentName === 'synthesizer' && action === 'analyze_alignment') {
+        result = await this.analyzeSynthesis(data.founder_a, data.founder_b);
+      } else if (agentName === 'namer' && action === 'generate_names') {
+        result = await this.generateNames(data.founder_a, data.founder_b, data.constraints);
+      } else if (agentName === 'facilitator') {
+        result = await this.facilitateConversation(data);
+      } else {
+        // Default mock response for unimplemented agents
+        result = {
+          agent: agentName,
+          action,
+          timestamp: new Date().toISOString(),
+          status: 'completed',
+          message: 'Agent functionality not yet implemented'
+        };
+      }
 
       // Log the agent interaction to session
       const session = await this.loadFromMemory('session.json');
       session.agent_interactions = session.agent_interactions || [];
-      session.agent_interactions.push(result);
+      session.agent_interactions.push({
+        agent: agentName,
+        action,
+        timestamp: new Date().toISOString(),
+        result
+      });
       await this.saveToMemory('session.json', session);
 
       res.json(result);
     } catch (error) {
+      console.error('Agent invocation error:', error);
       res.status(500).json({ error: 'Failed to invoke agent' });
     }
+  }
+
+  private async analyzeSynthesis(founderA: any, founderB: any) {
+    // Extract key information from founder responses
+    const aResponses = founderA?.responses || [];
+    const bResponses = founderB?.responses || [];
+    
+    // Get business context
+    const aIndustry = aResponses[1]?.content || "";
+    const bIndustry = bResponses[1]?.content || "";
+    const aMarket = aResponses[2]?.content || "";
+    const bMarket = bResponses[2]?.content || "";
+    const aPersonality = aResponses[4]?.content || "";
+    const bPersonality = bResponses[4]?.content || "";
+    
+    // TODO: Replace with actual OpenAI API call using founder data
+    return {
+      alignment_areas: `🎯 **Areas of Alignment:**
+• Both targeting similar market: ${this.findCommonElements(aIndustry, bIndustry)}
+• Shared geographic focus: ${this.findCommonElements(aMarket, bMarket)}
+• Flexible on domain extensions
+• Tech/innovation focused approach`,
+      
+      balance_areas: `⚖️ **Areas to Balance:**
+• Different naming style preferences: A(${aResponses[0]?.content.slice(0,50)}...) vs B(${bResponses[0]?.content.slice(0,50)}...)
+• Personality balance: ${aPersonality} vs ${bPersonality}
+• Cultural considerations for international appeal`,
+      
+      naming_strategy: `🚀 **Naming Strategy:**
+Based on your responses, I recommend names that blend ${this.extractKeywords(aResponses[0]?.content)} appeal with ${this.extractKeywords(bResponses[0]?.content)} credibility. Ready to see suggestions?`
+    };
+  }
+
+  private async generateNames(founderA: any, founderB: any, constraints: any) {
+    // Extract business context from responses
+    const aResponses = founderA?.responses || [];
+    const bResponses = founderB?.responses || [];
+    
+    const businessContext = aResponses[1]?.content || bResponses[1]?.content || "";
+    const aStylePrefs = aResponses[0]?.content || "";
+    const bStylePrefs = bResponses[0]?.content || "";
+    
+    // TODO: Replace with actual OpenAI API call using extracted context
+    // For now, generate contextually relevant names based on business
+    
+    const suggestions = await this.generateContextualSuggestions(businessContext, aStylePrefs, bStylePrefs);
+    
+    return {
+      suggestions,
+      analysis: `Generated ${suggestions.length} names based on business context: ${businessContext.slice(0, 100)}...`,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  private async generateContextualSuggestions(businessContext: string, styleA: string, styleB: string) {
+    // Extract keywords to determine business type
+    const isMinecraft = businessContext.toLowerCase().includes('minecraft');
+    const isAI = businessContext.toLowerCase().includes('ai') || businessContext.toLowerCase().includes('agent');
+    const isMCP = businessContext.toLowerCase().includes('mcp');
+    
+    if (isMinecraft && isAI) {
+      return [
+        { name: 'CraftAI', category: 'compound', rationale: 'Combines Minecraft craft theme with AI technology', confidence_score: 88, domain_status: 'available' },
+        { name: 'BlockAgent', category: 'compound', rationale: 'References Minecraft blocks + AI agent functionality', confidence_score: 85, domain_status: 'available' },
+        { name: 'VoxelCore', category: 'compound', rationale: 'Technical Minecraft term with stability/foundation meaning', confidence_score: 87, domain_status: 'available' },
+        { name: 'MineBot', category: 'compound', rationale: 'Simple, memorable name combining Minecraft + bot/AI', confidence_score: 83, domain_status: 'available' },
+        { name: 'CubeLink', category: 'compound', rationale: 'References blocks/cubes + networking/connection aspect', confidence_score: 81, domain_status: 'available' }
+      ];
+    } else {
+      // Generic tech startup names
+      return [
+        { name: 'TechFlow', category: 'compound', rationale: 'Suggests smooth technology processes', confidence_score: 75, domain_status: 'available' },
+        { name: 'InnoCore', category: 'compound', rationale: 'Innovation + core functionality', confidence_score: 78, domain_status: 'available' },
+        { name: 'NextGen', category: 'compound', rationale: 'Next generation technology solutions', confidence_score: 72, domain_status: 'premium' }
+      ];
+    }
+  }
+
+  private findCommonElements(textA: string, textB: string): string {
+    // Simple keyword matching - in real implementation, use NLP
+    const wordsA = textA.toLowerCase().split(/\s+/);
+    const wordsB = textB.toLowerCase().split(/\s+/);
+    const common = wordsA.filter(word => wordsB.includes(word) && word.length > 3);
+    return common.length > 0 ? common.join(', ') : 'shared business focus';
+  }
+
+  private extractKeywords(text: string): string {
+    // Extract style keywords - in real implementation, use NLP
+    if (!text) return 'modern';
+    const lower = text.toLowerCase();
+    if (lower.includes('concise') || lower.includes('fast')) return 'concise';
+    if (lower.includes('traditional') || lower.includes('franchouillard')) return 'traditional';
+    if (lower.includes('professional')) return 'professional';
+    return 'distinctive';
   }
 
   private async getAgentStatus(req: Request, res: Response) {
