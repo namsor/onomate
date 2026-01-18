@@ -67,6 +67,6 @@ outputs:
           type: "array"
 
 parameters:
-  max_follow_ups: 3
-  interview_timeout: 1800  # 30 minutes
-  save_interval: 300       # 5 minutes
+  max_follow_ups: 1
+  interview_timeout: 300  # 5 minutes (prod 30 minutes)
+  save_interval: 15       # 15 seconds (prod : 5 minutes)

@@ -55,6 +55,7 @@ class OnomateAPI {
     this.app.post('/founders', this.createFounderProfile.bind(this));
     this.app.get('/founders/:founderId', this.getFounderProfile.bind(this));
     this.app.put('/founders/:founderId', this.updateFounderProfile.bind(this));
+    this.app.post('/founders/:founderId/response', this.addFounderResponse.bind(this));
     
     // Shared constraints and alignment
     this.app.get('/shared/:sessionId', this.getSharedConstraints.bind(this));
@@ -192,6 +193,42 @@ class OnomateAPI {
       res.json(updatedProfile);
     } catch (error) {
       res.status(500).json({ error: 'Failed to update founder profile' });
+    }
+  }
+
+  private async addFounderResponse(req: Request, res: Response) {
+    try {
+      const { founderId } = req.params;
+      const { response, timestamp } = req.body;
+      
+      const existingProfile = await this.loadFromMemory(`${founderId}.json`);
+      
+      // Initialize responses array if it doesn't exist
+      if (!existingProfile.responses) {
+        existingProfile.responses = [];
+      }
+      
+      // Add new response
+      existingProfile.responses.push({
+        content: response,
+        timestamp: timestamp || new Date().toISOString(),
+        question_number: existingProfile.responses.length + 1
+      });
+      
+      // Update interview status based on number of responses
+      if (existingProfile.responses.length >= 5) {
+        existingProfile.interview_status = 'complete';
+      } else {
+        existingProfile.interview_status = 'in_progress';
+      }
+      
+      // Update timestamp
+      existingProfile.timestamp = new Date().toISOString();
+      
+      await this.saveToMemory(`${founderId}.json`, existingProfile);
+      res.json(existingProfile);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to save founder response' });
     }
   }
 

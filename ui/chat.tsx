@@ -97,6 +97,48 @@ const OnomateChat: React.FC = () => {
     setMessages(prev => [...prev, newMessage]);
   };
 
+  const saveFounderResponse = async (message: string, founder: string) => {
+    try {
+      await fetch(`${apiBase}/founders/${founder}/response`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ response: message, timestamp: new Date().toISOString() })
+      });
+    } catch (error) {
+      console.error('Failed to save founder response:', error);
+    }
+  };
+
+  const fetchFounderProfile = async (founder: string) => {
+    try {
+      const response = await fetch(`${apiBase}/founders/${founder}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch founder profile:', error);
+      return null;
+    }
+  };
+
+  const getNextInterviewQuestion = (founderProfile: any, lastResponse: string) => {
+    // Simple state machine for interview progression
+    const responses = founderProfile?.responses || [];
+    const responseCount = responses.length;
+    
+    if (responseCount === 0 || !lastResponse.trim()) {
+      return "What type of name do you envision for your startup? Please describe the style or feeling you're looking for.";
+    } else if (responseCount === 1) {
+      return "That sounds interesting! What industry or market are you targeting with your startup?";
+    } else if (responseCount === 2) {
+      return "How important is it that the name works internationally? Are there any specific markets you're focused on?";
+    } else if (responseCount === 3) {
+      return "What about domain availability? How flexible are you with domain extensions like .com, .io, .ai?";
+    } else if (responseCount === 4) {
+      return "Thinking about your company's personality, should the name sound more professional, innovative, approachable, or something else?";
+    } else {
+      return null; // Interview complete
+    }
+  };
+
   const sendMessage = async () => {
     if (!currentMessage.trim() || isLoading) return;
 
@@ -136,20 +178,21 @@ const OnomateChat: React.FC = () => {
   };
 
   const processInterviewMessage = async (message: string, founder: string) => {
-    // Mock interviewer agent response
-    const responses = [
-      "That's really helpful insight. Can you tell me more about what draws you to that approach?",
-      "I understand. What would success look like for your company name in that context?", 
-      "Interesting perspective. How important is that particular aspect compared to other naming considerations?",
-      "Got it. Let me ask about domain requirements - how critical is securing the .com domain?"
-    ];
+    // Save the founder's response
+    await saveFounderResponse(message, founder);
+    
+    // Get current founder profile to determine next question
+    const founderProfile = await fetchFounderProfile(founder);
+    const nextQuestion = getNextInterviewQuestion(founderProfile, message);
     
     await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
     
-    const randomIndex = Math.floor(Math.random() * responses.length);
-    const response = responses[randomIndex];
-    if (response) {
-      addSystemMessage(response, 'question');
+    if (nextQuestion) {
+      addSystemMessage(nextQuestion, 'question');
+    } else {
+      // Interview complete, move to next stage
+      addSystemMessage("Thank you for sharing your preferences! Now let's hear from the other founder.", 'system_update');
+      // Switch to other founder or progress to next stage
     }
   };
 

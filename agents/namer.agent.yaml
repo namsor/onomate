@@ -88,6 +88,6 @@ outputs:
 
 parameters:
   batch_size: 8
-  max_iterations: 5
+  max_iterations: 2 # Maximum refinement iterations (prod : 5)
   creativity_balance: 0.7  # Balance between creativity and constraints
   domain_priority: true

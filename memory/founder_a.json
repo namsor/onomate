@@ -1,7 +1,44 @@
 {
   "founder_id": "founder_a",
-  "timestamp": "2024-01-17T10:30:00Z",
+  "timestamp": "2026-01-18T12:19:05.418Z",
   "interview_status": "complete",
+  "responses": [
+    {
+      "content": "As Founder A, I like English sounding tech names",
+      "timestamp": "2026-01-18T11:31:20.449Z",
+      "question_number": 1
+    },
+    {
+      "content": "Our startup makes agents to automatically build impactful commercial PowerPoint presentations from past commercial successes",
+      "timestamp": "2026-01-18T11:32:43.760Z",
+      "question_number": 2
+    },
+    {
+      "content": "We focus on France, UAE, United States, Europe in general",
+      "timestamp": "2026-01-18T11:36:25.582Z",
+      "question_number": 3
+    },
+    {
+      "content": "Flexible, .io, .ai or .net are fine",
+      "timestamp": "2026-01-18T12:05:48.974Z",
+      "question_number": 4
+    },
+    {
+      "content": "innovative",
+      "timestamp": "2026-01-18T12:06:04.200Z",
+      "question_number": 5
+    },
+    {
+      "content": "Ok; What is the question?",
+      "timestamp": "2026-01-18T12:18:41.750Z",
+      "question_number": 6
+    },
+    {
+      "content": "Ok; What is the question?",
+      "timestamp": "2026-01-18T12:19:05.397Z",
+      "question_number": 7
+    }
+  ],
   "profile": {
     "business_context": {
       "industry": "",

@@ -1,5 +1,5 @@
 {
-  "session_id": "session_1768733750083",
+  "session_id": "session_1768736081072",
   "status": "created",
   "session_metadata": {
     "founders": [
@@ -34,7 +34,7 @@
   },
   "decision_trail": [
     {
-      "timestamp": "2026-01-18T10:55:50.083Z",
+      "timestamp": "2026-01-18T11:34:41.072Z",
       "decision_type": "session_start",
       "details": "Initiated naming session for co-founders",
       "agents_involved": [

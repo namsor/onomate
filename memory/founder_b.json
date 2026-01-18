@@ -1,6 +1,6 @@
 {
-  "founder_id": "founder_b", 
-  "timestamp": "2024-01-17T10:30:00Z",
+  "founder_id": "founder_b",
+  "timestamp": "2026-01-18T12:18:58.654Z",
   "interview_status": "complete",
   "profile": {
     "business_context": {
@@ -77,5 +77,42 @@
     "completion_percentage": 0,
     "follow_up_needed": [],
     "interviewer_notes": ""
-  }
+  },
+  "responses": [
+    {
+      "content": "ok",
+      "timestamp": "2026-01-18T12:06:45.119Z",
+      "question_number": 1
+    },
+    {
+      "content": "Notre société automatise la préparation de présentation commerciales Powerpoint, nous visons les industries taditionnelles de l'industrie, du bâtiment",
+      "timestamp": "2026-01-18T12:08:10.329Z",
+      "question_number": 2
+    },
+    {
+      "content": "C'est important, mais notre priorité est la France et le marché francophone",
+      "timestamp": "2026-01-18T12:17:09.288Z",
+      "question_number": 3
+    },
+    {
+      "content": "Felxible, .io, .ai ou .fr sont également valides",
+      "timestamp": "2026-01-18T12:17:26.788Z",
+      "question_number": 4
+    },
+    {
+      "content": "Professionnel, sérieux",
+      "timestamp": "2026-01-18T12:17:43.285Z",
+      "question_number": 5
+    },
+    {
+      "content": "Ok; What is the question? ",
+      "timestamp": "2026-01-18T12:18:29.277Z",
+      "question_number": 6
+    },
+    {
+      "content": "Ok; What is the question?",
+      "timestamp": "2026-01-18T12:18:58.647Z",
+      "question_number": 7
+    }
+  ]
 }
