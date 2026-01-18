@@ -63,14 +63,16 @@ class OnomateAPI {
   private setupRoutes() {
     // Session management
     this.app.post('/session', this.createSession.bind(this));
+    this.app.get('/sessions', this.getAllSessions.bind(this));
     this.app.get('/session/:sessionId', this.getSession.bind(this));
     this.app.put('/session/:sessionId', this.updateSession.bind(this));
+    this.app.delete('/session/:sessionId', this.deleteSession.bind(this));
     
-    // Founder management
-    this.app.post('/founders', this.createFounderProfile.bind(this));
-    this.app.get('/founders/:founderId', this.getFounderProfile.bind(this));
-    this.app.put('/founders/:founderId', this.updateFounderProfile.bind(this));
-    this.app.post('/founders/:founderId/response', this.addFounderResponse.bind(this));
+    // Founder management (session-specific)
+    this.app.post('/session/:sessionId/founders', this.createFounderProfile.bind(this));
+    this.app.get('/session/:sessionId/founders/:founderId', this.getFounderProfile.bind(this));
+    this.app.put('/session/:sessionId/founders/:founderId', this.updateFounderProfile.bind(this));
+    this.app.post('/session/:sessionId/founders/:founderId/response', this.addFounderResponse.bind(this));
     
     // Shared constraints and alignment
     this.app.get('/shared/:sessionId', this.getSharedConstraints.bind(this));
@@ -139,7 +141,7 @@ class OnomateAPI {
         }
       };
 
-      await this.saveToMemory('session.json', newSession);
+      await this.saveToMemory(`${sessionId}.json`, newSession);
       res.status(201).json({ sessionId, session: newSession });
     } catch (error) {
       res.status(500).json({ error: 'Failed to create session' });
@@ -148,7 +150,8 @@ class OnomateAPI {
 
   private async getSession(req: Request, res: Response) {
     try {
-      const session = await this.loadFromMemory('session.json');
+      const { sessionId } = req.params;
+      const session = await this.loadFromMemory(`${sessionId}.json`);
       res.json(session);
     } catch (error) {
       res.status(404).json({ error: 'Session not found' });
@@ -157,17 +160,93 @@ class OnomateAPI {
 
   private async updateSession(req: Request, res: Response) {
     try {
-      const session = await this.loadFromMemory('session.json');
+      const { sessionId } = req.params;
+      const session = await this.loadFromMemory(`${sessionId}.json`);
       const updatedSession = { ...session, ...req.body, updated_at: new Date().toISOString() };
-      await this.saveToMemory('session.json', updatedSession);
+      await this.saveToMemory(`${sessionId}.json`, updatedSession);
       res.json(updatedSession);
     } catch (error) {
       res.status(500).json({ error: 'Failed to update session' });
     }
   }
 
+  private async getAllSessions(req: Request, res: Response) {
+    try {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      const memoryDir = path.join(process.cwd(), 'memory');
+      
+      // Get all session files (ending with .json but not containing founder info)
+      const files = await fs.readdir(memoryDir);
+      const sessionFiles = files.filter(file => 
+        file.endsWith('.json') && 
+        !file.includes('founder_') && 
+        file !== 'shared.json'
+      );
+
+      const sessions = [];
+      for (const file of sessionFiles) {
+        try {
+          const session = await this.loadFromMemory(file);
+          const sessionId = file.replace('.json', '');
+          
+          sessions.push({
+            session_id: sessionId,
+            current_flow: session.session_metadata?.current_flow || 'intake',
+            progress: session.progress_tracking?.completion_percentage || 0,
+            final_decision: session.final_decision || null,
+            created_at: session.created_at,
+            updated_at: session.updated_at
+          });
+        } catch (error) {
+          console.error(`Failed to load session ${file}:`, error);
+        }
+      }
+
+      res.json(sessions);
+    } catch (error) {
+      console.error('Failed to get all sessions:', error);
+      res.status(500).json({ error: 'Failed to retrieve sessions' });
+    }
+  }
+
+  private async deleteSession(req: Request, res: Response) {
+    try {
+      const { sessionId } = req.params;
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      const memoryDir = path.join(process.cwd(), 'memory');
+
+      // Delete main session file
+      const sessionFile = path.join(memoryDir, `${sessionId}.json`);
+      await fs.unlink(sessionFile);
+
+      // Delete associated founder profile files
+      const founderFiles = [`${sessionId}_founder_a.json`, `${sessionId}_founder_b.json`];
+      for (const file of founderFiles) {
+        try {
+          const filePath = path.join(memoryDir, file);
+          await fs.unlink(filePath);
+        } catch (error) {
+          // File might not exist, which is fine
+          console.log(`Founder file ${file} not found, skipping deletion`);
+        }
+      }
+
+      res.json({ message: 'Session deleted successfully', sessionId });
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+      if (error.code === 'ENOENT') {
+        res.status(404).json({ error: 'Session not found' });
+      } else {
+        res.status(500).json({ error: 'Failed to delete session' });
+      }
+    }
+  }
+
   private async createFounderProfile(req: Request, res: Response) {
     try {
+      const { sessionId } = req.params;
       const { founderId } = req.body;
       const profile: FounderProfile = {
         founder_id: founderId,
@@ -182,7 +261,7 @@ class OnomateAPI {
         }
       };
 
-      await this.saveToMemory(`${founderId}.json`, profile);
+      await this.saveToMemory(`${sessionId}_${founderId}.json`, profile);
       res.status(201).json(profile);
     } catch (error) {
       res.status(500).json({ error: 'Failed to create founder profile' });
@@ -191,8 +270,8 @@ class OnomateAPI {
 
   private async getFounderProfile(req: Request, res: Response) {
     try {
-      const { founderId } = req.params;
-      const profile = await this.loadFromMemory(`${founderId}.json`);
+      const { sessionId, founderId } = req.params;
+      const profile = await this.loadFromMemory(`${sessionId}_${founderId}.json`);
       res.json(profile);
     } catch (error) {
       res.status(404).json({ error: 'Founder profile not found' });
@@ -201,10 +280,10 @@ class OnomateAPI {
 
   private async updateFounderProfile(req: Request, res: Response) {
     try {
-      const { founderId } = req.params;
-      const existingProfile = await this.loadFromMemory(`${founderId}.json`);
+      const { sessionId, founderId } = req.params;
+      const existingProfile = await this.loadFromMemory(`${sessionId}_${founderId}.json`);
       const updatedProfile = { ...existingProfile, ...req.body, timestamp: new Date().toISOString() };
-      await this.saveToMemory(`${founderId}.json`, updatedProfile);
+      await this.saveToMemory(`${sessionId}_${founderId}.json`, updatedProfile);
       res.json(updatedProfile);
     } catch (error) {
       res.status(500).json({ error: 'Failed to update founder profile' });
@@ -213,10 +292,10 @@ class OnomateAPI {
 
   private async addFounderResponse(req: Request, res: Response) {
     try {
-      const { founderId } = req.params;
+      const { sessionId, founderId } = req.params;
       const { response, timestamp } = req.body;
       
-      const existingProfile = await this.loadFromMemory(`${founderId}.json`);
+      const existingProfile = await this.loadFromMemory(`${sessionId}_${founderId}.json`);
       
       // Initialize responses array if it doesn't exist
       if (!existingProfile.responses) {
@@ -240,10 +319,11 @@ class OnomateAPI {
       // Update timestamp
       existingProfile.timestamp = new Date().toISOString();
       
-      await this.saveToMemory(`${founderId}.json`, existingProfile);
+      await this.saveToMemory(`${sessionId}_${founderId}.json`, existingProfile);
       res.json(existingProfile);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to save founder response' });
+      console.error('Error in addFounderResponse:', error);
+      res.status(500).json({ error: 'Failed to save founder response', details: error.message });
     }
   }
 
@@ -279,7 +359,8 @@ class OnomateAPI {
 
   private async addNameSuggestions(req: Request, res: Response) {
     try {
-      const session = await this.loadFromMemory('session.json');
+      const { sessionId } = req.params;
+      const session = await this.loadFromMemory(`${sessionId}.json`);
       const newNames = req.body.names || [];
       
       session.naming_journey.names_generated = [
@@ -292,7 +373,7 @@ class OnomateAPI {
         }))
       ];
 
-      await this.saveToMemory('session.json', session);
+      await this.saveToMemory(`${sessionId}.json`, session);
       res.json({ success: true, nameCount: newNames.length });
     } catch (error) {
       res.status(500).json({ error: 'Failed to add name suggestions' });
@@ -301,8 +382,8 @@ class OnomateAPI {
 
   private async addNameFeedback(req: Request, res: Response) {
     try {
-      const { nameId } = req.params;
-      const session = await this.loadFromMemory('session.json');
+      const { sessionId, nameId } = req.params;
+      const session = await this.loadFromMemory(`${sessionId}.json`);
       
       // Find and update the specific name
       const names = session.naming_journey.names_generated || [];
@@ -318,7 +399,7 @@ class OnomateAPI {
         timestamp: new Date().toISOString()
       };
 
-      await this.saveToMemory('session.json', session);
+      await this.saveToMemory(`${sessionId}.json`, session);
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: 'Failed to add name feedback' });
@@ -352,15 +433,23 @@ class OnomateAPI {
       }
 
       // Log the agent interaction to session
-      const session = await this.loadFromMemory('session.json');
-      session.agent_interactions = session.agent_interactions || [];
-      session.agent_interactions.push({
-        agent: agentName,
-        action,
-        timestamp: new Date().toISOString(),
-        result
-      });
-      await this.saveToMemory('session.json', session);
+      const sessionId = data.session_id;
+      if (sessionId) {
+        try {
+          const session = await this.loadFromMemory(`${sessionId}.json`);
+          session.agent_interactions = session.agent_interactions || [];
+          session.agent_interactions.push({
+            agent: agentName,
+            action,
+            timestamp: new Date().toISOString(),
+            result
+          });
+          await this.saveToMemory(`${sessionId}.json`, session);
+        } catch (error) {
+          console.warn('Failed to log agent interaction to session:', error);
+          // Don't fail the request if logging fails
+        }
+      }
 
       res.json(result);
     } catch (error) {
@@ -370,34 +459,61 @@ class OnomateAPI {
   }
 
   private async analyzeSynthesis(founderA: any, founderB: any) {
-    // Extract key information from founder responses
-    const aResponses = founderA?.responses || [];
-    const bResponses = founderB?.responses || [];
+    try {
+      console.log('Starting synthesis analysis for founders:', { 
+        founderA: founderA?.founder_id, 
+        founderB: founderB?.founder_id,
+        aResponses: founderA?.responses?.length || 0,
+        bResponses: founderB?.responses?.length || 0
+      });
+
+      // Extract key information from founder responses
+      const aResponses = founderA?.responses || [];
+      const bResponses = founderB?.responses || [];
+      
+      // Check if we have valid data
+      if (!founderA || !founderB) {
+        console.warn('Missing founder data for synthesis');
+        throw new Error('Missing founder data for synthesis');
+      }
+      
+      // Get business context with fallbacks
+      const aIndustry = aResponses[1]?.content || "startup industry";
+      const bIndustry = bResponses[1]?.content || "startup industry";
+      const aMarket = aResponses[2]?.content || "general market";
+      const bMarket = bResponses[2]?.content || "general market";
+      const aPersonality = aResponses[4]?.content || "professional";
+      const bPersonality = bResponses[4]?.content || "professional";
     
-    // Get business context
-    const aIndustry = aResponses[1]?.content || "";
-    const bIndustry = bResponses[1]?.content || "";
-    const aMarket = aResponses[2]?.content || "";
-    const bMarket = bResponses[2]?.content || "";
-    const aPersonality = aResponses[4]?.content || "";
-    const bPersonality = bResponses[4]?.content || "";
-    
-    // TODO: Replace with actual OpenAI API call using founder data
-    return {
-      alignment_areas: `🎯 **Areas of Alignment:**
+      // TODO: Replace with actual OpenAI API call using founder data
+      const result = {
+        alignment_areas: `🎯 **Areas of Alignment:**
 • Both targeting similar market: ${this.findCommonElements(aIndustry, bIndustry)}
 • Shared geographic focus: ${this.findCommonElements(aMarket, bMarket)}
 • Flexible on domain extensions
 • Tech/innovation focused approach`,
-      
-      balance_areas: `⚖️ **Areas to Balance:**
-• Different naming style preferences: A(${aResponses[0]?.content.slice(0,50)}...) vs B(${bResponses[0]?.content.slice(0,50)}...)
+        
+        balance_areas: `⚖️ **Areas to Balance:**
+• Different naming style preferences: A(${aResponses[0]?.content?.slice(0,50) || 'modern'}...) vs B(${bResponses[0]?.content?.slice(0,50) || 'professional'}...)
 • Personality balance: ${aPersonality} vs ${bPersonality}
 • Cultural considerations for international appeal`,
-      
-      naming_strategy: `🚀 **Naming Strategy:**
+        
+        naming_strategy: `🚀 **Naming Strategy:**
 Based on your responses, I recommend names that blend ${this.extractKeywords(aResponses[0]?.content)} appeal with ${this.extractKeywords(bResponses[0]?.content)} credibility. Ready to see suggestions?`
-    };
+      };
+
+      console.log('Synthesis analysis completed successfully');
+      return result;
+      
+    } catch (error) {
+      console.error('Error in analyzeSynthesis:', error);
+      // Return fallback analysis
+      return {
+        alignment_areas: "🎯 **Areas of Alignment:**\nAnalyzing common ground between founders...",
+        balance_areas: "⚖️ **Areas to Balance:**\nIdentifying differences to address...", 
+        naming_strategy: "🚀 **Naming Strategy:**\nDeveloping approach based on your preferences... Ready to see suggestions?"
+      };
+    }
   }
 
   private async generateNames(founderA: any, founderB: any, constraints: any) {

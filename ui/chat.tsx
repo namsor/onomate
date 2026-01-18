@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-// import './Chat.css';
+import './chat.css';
 
 interface Message {
   id: string;
@@ -53,8 +53,13 @@ const OnomateChat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const apiBase = 'http://localhost:3001';
 
+  // Session Management State
+  const [availableSessions, setAvailableSessions] = useState<any[]>([]);
+  const [showSessionManager, setShowSessionManager] = useState(false);
+
   useEffect(() => {
     initializeSession();
+    loadAvailableSessions();
   }, []);
 
   useEffect(() => {
@@ -67,9 +72,7 @@ const OnomateChat: React.FC = () => {
 
   const initializeSession = async () => {
     try {
-      // First, reset founder profiles for a fresh start
-      await resetFounderProfiles();
-      
+      // Create session first
       const response = await fetch(`${apiBase}/session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,6 +92,9 @@ const OnomateChat: React.FC = () => {
         conversation_health: 'healthy'
       });
 
+      // Now create/reset founder profiles with the session ID
+      await resetFounderProfilesForSession(sessionId);
+
       // Reset conversation state
       setAlignmentAnalysisShown(false);
       setNameSuggestions([]);
@@ -102,6 +108,12 @@ const OnomateChat: React.FC = () => {
   };
 
   const resetFounderProfiles = async () => {
+    const sessionId = sessionState?.session_id;
+    if (!sessionId) return;
+    await resetFounderProfilesForSession(sessionId);
+  };
+
+  const resetFounderProfilesForSession = async (sessionId: string) => {
     try {
       // Reset both founder profiles to start fresh
       const resetProfile = (founderId: string) => ({
@@ -115,16 +127,17 @@ const OnomateChat: React.FC = () => {
         }
       });
 
-      await fetch(`${apiBase}/founders/founder_a`, {
-        method: 'PUT',
+      // Create founder profiles if they don't exist
+      await fetch(`${apiBase}/session/${sessionId}/founders`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(resetProfile('founder_a'))
+        body: JSON.stringify({ founderId: 'founder_a', profile: resetProfile('founder_a') })
       });
 
-      await fetch(`${apiBase}/founders/founder_b`, {
-        method: 'PUT',
+      await fetch(`${apiBase}/session/${sessionId}/founders`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(resetProfile('founder_b'))
+        body: JSON.stringify({ founderId: 'founder_b', profile: resetProfile('founder_b') })
       });
     } catch (error) {
       console.error('Failed to reset founder profiles:', error);
@@ -139,20 +152,24 @@ const OnomateChat: React.FC = () => {
       return;
     }
     
+    // Increment counter first to ensure uniqueness
+    setMessageCounter(prev => prev + 1);
+    
     const newMessage: Message = {
-      id: `msg_${Date.now()}_${messageCounter}`,
+      id: `msg_${Date.now()}_${messageCounter + 1}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
       sender: 'facilitator',
       content,
       type
     };
     setMessages(prev => [...prev, newMessage]);
-    setMessageCounter(prev => prev + 1);
   };
 
   const saveFounderResponse = async (message: string, founder: string) => {
     try {
-      await fetch(`${apiBase}/founders/${founder}/response`, {
+      const sessionId = sessionState?.session_id;
+      if (!sessionId) return;
+      await fetch(`${apiBase}/session/${sessionId}/founders/${founder}/response`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ response: message, timestamp: new Date().toISOString() })
@@ -164,7 +181,9 @@ const OnomateChat: React.FC = () => {
 
   const fetchFounderProfile = async (founder: string) => {
     try {
-      const response = await fetch(`${apiBase}/founders/${founder}`);
+      const sessionId = sessionState?.session_id;
+      if (!sessionId) return null;
+      const response = await fetch(`${apiBase}/session/${sessionId}/founders/${founder}`);
       return await response.json();
     } catch (error) {
       console.error('Failed to fetch founder profile:', error);
@@ -244,7 +263,7 @@ const OnomateChat: React.FC = () => {
 
     // Add user message
     const userMessage: Message = {
-      id: `msg_${Date.now()}`,
+      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
       sender: currentFounder,
       content: currentMessage,
@@ -689,6 +708,87 @@ const OnomateChat: React.FC = () => {
     }
   };
 
+  // Session Management Functions
+  const loadAvailableSessions = async () => {
+    try {
+      const response = await fetch(`${apiBase}/sessions`);
+      const sessions = await response.json();
+      setAvailableSessions(sessions);
+    } catch (error) {
+      console.error('Failed to load available sessions:', error);
+    }
+  };
+
+  const createNewSession = async () => {
+    try {
+      const response = await fetch(`${apiBase}/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          founders: ['founder_a', 'founder_b']
+        })
+      });
+      const result = await response.json();
+      
+      // Switch to new session
+      await loadSession(result.sessionId);
+      await loadAvailableSessions();
+      setShowSessionManager(false);
+      
+    } catch (error) {
+      console.error('Failed to create new session:', error);
+    }
+  };
+
+  const loadSession = async (sessionId: string) => {
+    try {
+      const response = await fetch(`${apiBase}/session/${sessionId}`);
+      const session = await response.json();
+      
+      setSessionState({
+        session_id: sessionId,
+        current_flow: session.session_metadata?.current_flow || 'intake',
+        current_stage: session.session_metadata?.current_stage || 'welcome',
+        founder_profiles: { founder_a: {}, founder_b: {} },
+        progress_percentage: session.progress_tracking?.completion_percentage || 0,
+        conversation_health: 'healthy'
+      });
+      
+      // Clear current conversation state for new session
+      setMessages([]);
+      setNameSuggestions([]);
+      setAlignmentAnalysisShown(false);
+      setVotingState({ isVoting: false, topCandidates: [], votes: {} });
+      
+      // Add welcome message for loaded session
+      if (session.session_metadata?.current_flow === 'intake') {
+        addSystemMessage("Session loaded! Let's continue where we left off.");
+      } else {
+        addSystemMessage(`Session loaded! Current progress: ${session.progress_tracking?.completion_percentage || 0}%`);
+      }
+      
+    } catch (error) {
+      console.error('Failed to load session:', error);
+    }
+  };
+
+  const deleteSession = async (sessionId: string) => {
+    try {
+      await fetch(`${apiBase}/session/${sessionId}`, {
+        method: 'DELETE'
+      });
+      await loadAvailableSessions();
+      
+      // If deleted session was current session, create new one
+      if (sessionState?.session_id === sessionId) {
+        await initializeSession();
+      }
+      
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+    }
+  };
+
   const generateNameSuggestions = async () => {
     setIsLoading(true);
     addSystemMessage("Let me generate name suggestions based on your preferences...", 'system_update');
@@ -951,11 +1051,21 @@ const OnomateChat: React.FC = () => {
           <h2>Onomate Naming Session</h2>
           {sessionState && (
             <div className="session-details">
+              <span>Session: {sessionState.session_id}</span>
               <span>Flow: {sessionState.current_flow}</span>
               <span>Stage: {sessionState.current_stage}</span>
               <span>Progress: {sessionState.progress_percentage}%</span>
             </div>
           )}
+        </div>
+        
+        <div className="session-controls">
+          <button 
+            className="session-manager-btn"
+            onClick={() => setShowSessionManager(true)}
+          >
+            📁 Sessions
+          </button>
         </div>
         
         <div className="founder-switch">
@@ -1043,6 +1153,68 @@ const OnomateChat: React.FC = () => {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {showSessionManager && (
+          <div className="session-manager-overlay">
+            <div className="session-manager">
+              <div className="session-manager-header">
+                <h3>Session Manager</h3>
+                <button 
+                  className="close-btn"
+                  onClick={() => setShowSessionManager(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="session-actions">
+                <button 
+                  className="new-session-btn"
+                  onClick={createNewSession}
+                >
+                  ➕ New Session
+                </button>
+              </div>
+              
+              <div className="sessions-list">
+                <h4>Available Sessions ({availableSessions.length})</h4>
+                {availableSessions.length === 0 ? (
+                  <p>No sessions available</p>
+                ) : (
+                  availableSessions.map((session) => (
+                    <div key={session.session_id} className="session-item">
+                      <div className="session-info">
+                        <div className="session-id">{session.session_id}</div>
+                        <div className="session-meta">
+                          <span>Progress: {session.progress}%</span>
+                          <span>Flow: {session.current_flow}</span>
+                          {session.final_decision && (
+                            <span>✅ {session.final_decision}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="session-actions">
+                        <button 
+                          className="load-btn"
+                          onClick={() => loadSession(session.session_id)}
+                          disabled={sessionState?.session_id === session.session_id}
+                        >
+                          {sessionState?.session_id === session.session_id ? '✓ Current' : 'Load'}
+                        </button>
+                        <button 
+                          className="delete-btn"
+                          onClick={() => deleteSession(session.session_id)}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
