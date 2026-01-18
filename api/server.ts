@@ -368,9 +368,8 @@ class OnomateAPI {
 }
 
 // Start the server if this file is run directly
-if (import.meta.url === new URL(process.argv[1], 'file:').href) {
-  const api = new OnomateAPI();
-  api.start();
-}
+// In ES modules, we can simply start the server since this file is the entry point
+const api = new OnomateAPI();
+api.start();
 
 export default OnomateAPI;
