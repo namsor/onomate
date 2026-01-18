@@ -1,19 +1,26 @@
 {
-  "session_id": "session_1768744003082",
+  "session_id": "session_1768747562667",
   "status": "created",
   "session_metadata": {
-    "current_flow": "alignment",
-    "current_stage": "analysis"
+    "founders": [
+      "founder_a",
+      "founder_b"
+    ],
+    "facilitator_agent": "facilitator",
+    "current_flow": "intake",
+    "current_stage": "welcome",
+    "estimated_duration_minutes": 180,
+    "actual_duration_minutes": 0
   },
   "progress_tracking": {
-    "flows_completed": [
-      "intake"
-    ],
+    "flows_completed": [],
     "current_objectives": [
-      "Analyze founder alignment",
-      "Identify naming strategy"
+      "Complete founder interviews"
     ],
-    "completion_percentage": 30
+    "next_milestones": [
+      "Gather individual preferences"
+    ],
+    "completion_percentage": 0
   },
   "conversation_state": {
     "energy_level": "high",
@@ -27,7 +34,7 @@
   },
   "decision_trail": [
     {
-      "timestamp": "2026-01-18T13:46:43.082Z",
+      "timestamp": "2026-01-18T14:46:02.667Z",
       "decision_type": "session_start",
       "details": "Initiated naming session for co-founders",
       "agents_involved": [
@@ -43,72 +50,5 @@
     "names_evaluated": [],
     "shortlist": [],
     "final_decision": null
-  },
-  "current_flow": "intake",
-  "current_stage": "welcome",
-  "founder_profiles": {
-    "founder_a": {},
-    "founder_b": {}
-  },
-  "progress_percentage": 0,
-  "conversation_health": "healthy",
-  "updated_at": "2026-01-18T13:48:06.934Z",
-  "agent_interactions": [
-    {
-      "agent": "synthesizer",
-      "action": "analyze_alignment",
-      "timestamp": "2026-01-18T13:48:17.326Z",
-      "result": {
-        "alignment_areas": "🎯 **Areas of Alignment:**\n• Both targeting similar market: minecraft, minecraft\n• Shared geographic focus: shared business focus\n• Flexible on domain extensions\n• Tech/innovation focused approach",
-        "balance_areas": "⚖️ **Areas to Balance:**\n• Different naming style preferences: A(I love concise and fast names like : minecraft, di...) vs B(Moi j'aime les noms bien franchouillards comme : M...)\n• Personality balance: approachable vs innovateur\n• Cultural considerations for international appeal",
-        "naming_strategy": "🚀 **Naming Strategy:**\nBased on your responses, I recommend names that blend concise appeal with traditional credibility. Ready to see suggestions?"
-      }
-    },
-    {
-      "agent": "namer",
-      "action": "generate_names",
-      "timestamp": "2026-01-18T13:48:34.415Z",
-      "result": {
-        "suggestions": [
-          {
-            "name": "CraftAI",
-            "category": "compound",
-            "rationale": "Combines Minecraft craft theme with AI technology",
-            "confidence_score": 88,
-            "domain_status": "available"
-          },
-          {
-            "name": "BlockAgent",
-            "category": "compound",
-            "rationale": "References Minecraft blocks + AI agent functionality",
-            "confidence_score": 85,
-            "domain_status": "available"
-          },
-          {
-            "name": "VoxelCore",
-            "category": "compound",
-            "rationale": "Technical Minecraft term with stability/foundation meaning",
-            "confidence_score": 87,
-            "domain_status": "available"
-          },
-          {
-            "name": "MineBot",
-            "category": "compound",
-            "rationale": "Simple, memorable name combining Minecraft + bot/AI",
-            "confidence_score": 83,
-            "domain_status": "available"
-          },
-          {
-            "name": "CubeLink",
-            "category": "compound",
-            "rationale": "References blocks/cubes + networking/connection aspect",
-            "confidence_score": 81,
-            "domain_status": "available"
-          }
-        ],
-        "analysis": "Generated 5 names based on business context: it's a MCP server for Minecraft AI agents, and I target an international market of minecraft develop...",
-        "timestamp": "2026-01-18T13:48:34.414Z"
-      }
-    }
-  ]
+  }
 }

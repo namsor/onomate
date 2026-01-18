@@ -2,6 +2,11 @@ import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import OpenAI from 'openai';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 interface FounderProfile {
   founder_id: string;
@@ -31,10 +36,20 @@ interface SharedConstraints {
 class OnomateAPI {
   private app: express.Application;
   private memoryPath: string;
+  private openai: OpenAI;
 
   constructor() {
     this.app = express();
     this.memoryPath = join(process.cwd(), 'memory');
+    
+    // Initialize OpenAI client
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('Warning: OPENAI_API_KEY not found in environment variables');
+    }
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+    
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -404,26 +419,87 @@ Based on your responses, I recommend names that blend ${this.extractKeywords(aRe
   }
 
   private async generateContextualSuggestions(businessContext: string, styleA: string, styleB: string) {
-    // Extract keywords to determine business type
-    const isMinecraft = businessContext.toLowerCase().includes('minecraft');
-    const isAI = businessContext.toLowerCase().includes('ai') || businessContext.toLowerCase().includes('agent');
-    const isMCP = businessContext.toLowerCase().includes('mcp');
-    
-    if (isMinecraft && isAI) {
-      return [
-        { name: 'CraftAI', category: 'compound', rationale: 'Combines Minecraft craft theme with AI technology', confidence_score: 88, domain_status: 'available' },
-        { name: 'BlockAgent', category: 'compound', rationale: 'References Minecraft blocks + AI agent functionality', confidence_score: 85, domain_status: 'available' },
-        { name: 'VoxelCore', category: 'compound', rationale: 'Technical Minecraft term with stability/foundation meaning', confidence_score: 87, domain_status: 'available' },
-        { name: 'MineBot', category: 'compound', rationale: 'Simple, memorable name combining Minecraft + bot/AI', confidence_score: 83, domain_status: 'available' },
-        { name: 'CubeLink', category: 'compound', rationale: 'References blocks/cubes + networking/connection aspect', confidence_score: 81, domain_status: 'available' }
-      ];
-    } else {
-      // Generic tech startup names
-      return [
-        { name: 'TechFlow', category: 'compound', rationale: 'Suggests smooth technology processes', confidence_score: 75, domain_status: 'available' },
-        { name: 'InnoCore', category: 'compound', rationale: 'Innovation + core functionality', confidence_score: 78, domain_status: 'available' },
-        { name: 'NextGen', category: 'compound', rationale: 'Next generation technology solutions', confidence_score: 72, domain_status: 'premium' }
-      ];
+    try {
+      console.log('Generating contextual suggestions with OpenAI for:', { businessContext, styleA, styleB });
+      
+      const prompt = `You are an expert startup naming consultant. Generate 5 unique startup name suggestions based on the following context:
+
+Business Context: ${businessContext}
+Founder A Style Preferences: ${styleA}
+Founder B Style Preferences: ${styleB}
+
+Requirements:
+- Names should be memorable, brandable, and professional
+- Consider both founders' style preferences
+- Names should work internationally
+- Include mix of compound words, coined terms, and descriptive names
+- Avoid generic tech terms like "Tech", "Pro", "Solutions"
+
+For each name suggestion, provide:
+1. The name itself
+2. Category (compound/coined/descriptive/metaphorical)
+3. Detailed rationale explaining why it fits the business and founder preferences
+4. Confidence score (1-100)
+5. Likely domain availability (available/premium/unavailable)
+
+Respond in JSON format:
+{
+  "suggestions": [
+    {
+      "name": "ExampleName",
+      "category": "compound",
+      "rationale": "Detailed explanation of why this name works...",
+      "confidence_score": 85,
+      "domain_status": "available"
+    }
+  ]
+}`;
+
+      const completion = await this.openai.chat.completions.create({
+        model: process.env.DEFAULT_MODEL || 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert startup naming consultant with deep knowledge of branding, linguistics, and market positioning. Generate creative, memorable business names that balance founder preferences with market viability.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 1500
+      });
+
+      const responseText = completion.choices[0]?.message?.content;
+      if (!responseText) {
+        throw new Error('No response from OpenAI');
+      }
+
+      // Parse the JSON response
+      const aiResponse = JSON.parse(responseText);
+      
+      if (!aiResponse.suggestions || !Array.isArray(aiResponse.suggestions)) {
+        throw new Error('Invalid response format from OpenAI');
+      }
+
+      // Ensure each suggestion has required fields
+      const formattedSuggestions = aiResponse.suggestions.map((suggestion: any, index: number) => ({
+        name: suggestion.name || `AIName${index + 1}`,
+        category: suggestion.category || 'compound',
+        rationale: suggestion.rationale || 'AI-generated suggestion',
+        confidence_score: suggestion.confidence_score || 80,
+        domain_status: suggestion.domain_status || 'unknown'
+      }));
+
+      console.log(`Generated ${formattedSuggestions.length} names via OpenAI`);
+      return formattedSuggestions;
+      
+    } catch (error) {
+      console.error('OpenAI name generation failed:', error);
+      
+      // If OpenAI fails, throw an error instead of returning hardcoded fallbacks
+      throw new Error('AI name generation service temporarily unavailable. Please try again later.');
     }
   }
 

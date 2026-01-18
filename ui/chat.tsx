@@ -483,14 +483,29 @@ const OnomateChat: React.FC = () => {
       const nameData = await nameResponse.json();
       
       if (nameData.suggestions && Array.isArray(nameData.suggestions)) {
-        setNameSuggestions(nameData.suggestions.map((name: any, index: number) => ({
+        const formattedSuggestions = nameData.suggestions.map((name: any, index: number) => ({
           id: `name_${index + 1}`,
           name: name.name,
           category: name.category || 'compound',
           rationale: name.rationale || 'AI-generated suggestion',
           confidence_score: name.confidence_score || 80,
           domain_status: name.domain_status || 'unknown'
-        })));
+        }));
+        
+        setNameSuggestions(formattedSuggestions);
+        
+        // Save names to session backend
+        if (sessionState?.session_id) {
+          try {
+            await fetch(`${apiBase}/names/${sessionState.session_id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ names: formattedSuggestions })
+            });
+          } catch (error) {
+            console.error('Failed to save names to session:', error);
+          }
+        }
       } else {
         // Fallback if AI generation fails
         throw new Error('Invalid AI response format');
@@ -498,17 +513,9 @@ const OnomateChat: React.FC = () => {
       
     } catch (error) {
       console.error('AI name generation failed:', error);
-      // Fallback to basic suggestions if AI fails
-      setNameSuggestions([
-        {
-          id: 'name_1',
-          name: 'TechStart',
-          category: 'compound',
-          rationale: 'Simple, professional name (AI generation temporarily unavailable)',
-          confidence_score: 70,
-          domain_status: 'unknown'
-        }
-      ]);
+      // Show error message instead of fallback names
+      addSystemMessage("I apologize, but I'm having trouble generating name suggestions right now. Please try again in a moment, or let me know if you'd like to discuss your preferences further.", 'message');
+      setNameSuggestions([]);
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -516,109 +523,75 @@ const OnomateChat: React.FC = () => {
     setIsLoading(false);
   };
 
-  const generateContextualNames = async (founderA: any, founderB: any) => {
-    // Extract context from actual responses
-    const aResponses = founderA?.responses || [];
-    const bResponses = founderB?.responses || [];
-    
-    // Create names relevant to Minecraft AI MCP server
-    return [
-      {
-        id: 'name_1',
-        name: 'CraftAI',
-        category: 'compound',
-        rationale: 'Combines Minecraft "Craft" theme with AI - concise like Discord, professional appeal',
-        confidence_score: 88,
-        domain_status: 'available'
-      },
-      {
-        id: 'name_2', 
-        name: 'BlockBot',
-        category: 'compound',
-        rationale: 'Short and memorable (like GitHub), clearly indicates Minecraft + AI automation',
-        confidence_score: 85,
-        domain_status: 'available'
-      },
-      {
-        id: 'name_3',
-        name: 'MineLink',
-        category: 'compound',
-        rationale: 'International appeal, suggests connection (MCP server function), easy pronunciation',
-        confidence_score: 82,
-        domain_status: 'premium'
-      },
-      {
-        id: 'name_4',
-        name: 'VoxelCore',
-        category: 'compound',
-        rationale: 'Technical Minecraft term + "Core" for stability/foundation - innovative yet solid',
-        confidence_score: 87,
-        domain_status: 'available'
-      },
-      {
-        id: 'name_5',
-        name: 'CubeNet',
-        category: 'compound',
-        rationale: 'Simple, fast name. Cube references Minecraft blocks, Net suggests networking/MCP',
-        confidence_score: 80,
-        domain_status: 'available'
-      }
-    ];
-  };
+
 
   const generateVariationsAndAlternatives = async () => {
     setIsLoading(true);
     addSystemMessage("Generating variations and alternatives based on your feedback...", 'system_update');
     
-    // Generate new suggestions that address the specific preferences we've learned
-    const variationNames: NameSuggestion[] = [
-      {
-        id: 'var_1',
-        name: 'SlideCraft Pro',
-        category: 'compound',
-        rationale: 'Variation of SlideForge - adds "Pro" for professional appeal (addressing Founder B\'s preference)',
-        confidence_score: 86,
-        domain_status: 'available'
-      },
-      {
-        id: 'var_2', 
-        name: 'PrésentoTech',
-        category: 'coined',
-        rationale: 'Blends French "Présento" with "Tech" - works in both markets, innovative yet traditional',
-        confidence_score: 84,
-        domain_status: 'available'
-      },
-      {
-        id: 'var_3',
-        name: 'DeckMaster',
-        category: 'compound',
-        rationale: 'More traditional-sounding alternative to DeckBot, emphasizes expertise and mastery',
-        confidence_score: 82,
-        domain_status: 'premium'
-      },
-      {
-        id: 'var_4',
-        name: 'SlideWorks',
-        category: 'compound',
-        rationale: 'Simpler, more professional variation - combines presentation focus with craftsmanship',
-        confidence_score: 80,
-        domain_status: 'available'
-      },
-      {
-        id: 'var_5',
-        name: 'AutoSlide',
-        category: 'compound',
-        rationale: 'Clear automation focus, easy pronunciation in French and English markets',
-        confidence_score: 78,
-        domain_status: 'available'
+    try {
+      // Get founder profiles and current suggestions for context
+      const founderAProfile = await fetchFounderProfile('founder_a');
+      const founderBProfile = await fetchFounderProfile('founder_b');
+      
+      // Call the namer agent for AI-generated variations
+      const nameResponse = await fetch(`${apiBase}/agents/namer/invoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_variations',
+          data: {
+            founder_a: founderAProfile,
+            founder_b: founderBProfile,
+            previous_suggestions: nameSuggestions,
+            session_id: sessionState?.session_id,
+            constraints: {
+              count: 5,
+              variation_type: 'alternatives',
+              include_rationale: true
+            }
+          }
+        })
+      });
+      
+      const variationData = await nameResponse.json();
+      
+      if (variationData.suggestions && Array.isArray(variationData.suggestions)) {
+        const formattedVariations = variationData.suggestions.map((name: any, index: number) => ({
+          id: `var_${index + 1}`,
+          name: name.name,
+          category: name.category || 'compound',
+          rationale: name.rationale || 'AI-generated variation',
+          confidence_score: name.confidence_score || 80,
+          domain_status: name.domain_status || 'unknown'
+        }));
+        
+        setNameSuggestions(formattedVariations);
+        
+        // Save variations to session backend
+        if (sessionState?.session_id) {
+          try {
+            await fetch(`${apiBase}/names/${sessionState.session_id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ names: formattedVariations })
+            });
+          } catch (error) {
+            console.error('Failed to save variations to session:', error);
+          }
+        }
+      } else {
+        throw new Error('Invalid AI variation response');
       }
-    ];
+      
+    } catch (error) {
+      console.error('AI variation generation failed:', error);
+      addSystemMessage("I'm having trouble generating variations right now. Could you tell me more specifically what aspects you'd like me to explore or modify from the previous suggestions?", 'message');
+      setNameSuggestions([]);
+    }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Replace existing suggestions with new variations
-    setNameSuggestions(variationNames);
-    addSystemMessage("Here are new variations and alternatives! I've focused on names that better balance your preferences - some with more traditional appeal for the French market, others with clearer automation messaging. Please share your reactions!", 'name_suggestion');
+    addSystemMessage("I've generated new variations based on your feedback and preferences. Please review and share your reactions!", 'name_suggestion');
     setIsLoading(false);
   };
 
@@ -703,7 +676,8 @@ const OnomateChat: React.FC = () => {
 
     // Send feedback to API
     try {
-      await fetch(`${apiBase}/names/current/${nameId}/feedback`, {
+      const sessionId = sessionState?.session_id || 'default_session';
+      await fetch(`${apiBase}/names/${sessionId}/${nameId}/feedback`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

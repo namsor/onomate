@@ -1,7 +1,7 @@
 {
   "founder_id": "founder_b",
-  "timestamp": "2026-01-18T13:48:05.913Z",
-  "interview_status": "complete",
+  "timestamp": "2026-01-18T14:46:02.651Z",
+  "interview_status": "not_started",
   "profile": {
     "business_context": {},
     "naming_preferences": {}
@@ -12,31 +12,5 @@
     "follow_up_needed": [],
     "interviewer_notes": ""
   },
-  "responses": [
-    {
-      "content": "Moi j'aime les noms bien franchouillards comme : Michelin, Legrand, Atos",
-      "timestamp": "2026-01-18T13:47:37.371Z",
-      "question_number": 1
-    },
-    {
-      "content": "La communauté de développeurs Minecraft",
-      "timestamp": "2026-01-18T13:47:46.138Z",
-      "question_number": 2
-    },
-    {
-      "content": "Important",
-      "timestamp": "2026-01-18T13:47:51.931Z",
-      "question_number": 3
-    },
-    {
-      "content": "Flexible",
-      "timestamp": "2026-01-18T13:47:58.785Z",
-      "question_number": 4
-    },
-    {
-      "content": "innovateur",
-      "timestamp": "2026-01-18T13:48:05.905Z",
-      "question_number": 5
-    }
-  ]
+  "responses": []
 }

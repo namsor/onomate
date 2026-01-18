@@ -1,34 +1,8 @@
 {
   "founder_id": "founder_a",
-  "timestamp": "2026-01-18T13:47:26.322Z",
-  "interview_status": "complete",
-  "responses": [
-    {
-      "content": "I love concise and fast names like : minecraft, discord, youtube, github",
-      "timestamp": "2026-01-18T13:46:54.092Z",
-      "question_number": 1
-    },
-    {
-      "content": "it's a MCP server for Minecraft AI agents, and I target an international market of minecraft developpers",
-      "timestamp": "2026-01-18T13:47:03.219Z",
-      "question_number": 2
-    },
-    {
-      "content": "Very important, it should focus on US market",
-      "timestamp": "2026-01-18T13:47:11.859Z",
-      "question_number": 3
-    },
-    {
-      "content": "Flexible",
-      "timestamp": "2026-01-18T13:47:19.491Z",
-      "question_number": 4
-    },
-    {
-      "content": "approachable",
-      "timestamp": "2026-01-18T13:47:26.314Z",
-      "question_number": 5
-    }
-  ],
+  "timestamp": "2026-01-18T14:46:02.631Z",
+  "interview_status": "not_started",
+  "responses": [],
   "profile": {
     "business_context": {},
     "naming_preferences": {}
