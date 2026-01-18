@@ -16,7 +16,7 @@ stages:
     actions:
       - agent: "facilitator"
         action: "introduction"
-        message: "Welcome to Onomate! I'll be helping you both find the perfect name for your startup. Let's start by understanding each of your individual preferences."
+        message: "Welcome to Onomate! I'll be helping you both find the perfect name for your startup. Let's start by understanding each of your individual preferences. What type of name do you envision for your startup?"
         
   - name: "individual_interviews"
     duration: 1800  # 30 minutes

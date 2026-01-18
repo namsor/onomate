@@ -1,5 +1,5 @@
 {
-  "session_id": "session_1768749266683",
+  "session_id": "session_1768752510766",
   "status": "created",
   "session_metadata": {
     "current_flow": "alignment",
@@ -27,7 +27,7 @@
   },
   "decision_trail": [
     {
-      "timestamp": "2026-01-18T15:14:26.683Z",
+      "timestamp": "2026-01-18T16:08:30.766Z",
       "decision_type": "session_start",
       "details": "Initiated naming session for co-founders",
       "agents_involved": [
@@ -42,143 +42,188 @@
     "names_generated": [
       {
         "id": "name_1",
-        "name": "BookInnSuite",
+        "name": "BookClerk",
         "category": "compound",
-        "rationale": "This name combines 'booking', 'inn', and 'suite' — three words related to the hotel industry. It's an English sounding tech name that aims to satisfy Founder A's preferences. The name describes the company's mission to help hotels with complex bookings. Although it doesn't have a direct French connection, 'suite' is also a French word, which could subtly satisfy Founder B's preferences.",
-        "confidence_score": 85,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:16:53.817Z",
+        "rationale": "BookClerk incorporates an English tech sounding term (book) with a traditional service role (clerk), reflecting both Founder A and B's preferences. The name is simple, professional, and easily understood in both English and French markets. It conveys the innovative yet serious nature of the company.",
+        "confidence_score": 89,
+        "domain_status": "likely available with .io, .ai or .fr extension",
+        "timestamp": "2026-01-18T16:11:19.660Z",
         "feedback": {
           "founder": "founder_b",
-          "reaction": "neutral",
-          "timestamp": "2026-01-18T15:17:32.547Z"
+          "reaction": "like",
+          "timestamp": "2026-01-18T16:15:43.305Z"
         }
       },
       {
         "id": "name_2",
-        "name": "Reservorama",
+        "name": "ReservElite",
         "category": "compound",
-        "rationale": "This name merges 'reservation' and 'orama' (a suffix indicating a comprehensive view of something) to create a unique, memorable English name that aligns with Founder A's preferences. The 'orama' ending also gives the name a slightly French sound to satisfy Founder B's preferences. This name suggests that the company provides a comprehensive solution for hotel reservation complexities.",
-        "confidence_score": 80,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:16:53.817Z",
+        "rationale": "ReservElite represents a blend of English (Reserv for reservation) and French elite (Elite), thus satisfying both founders' preferences. This name appears innovative, serious, and high-end, indicating a premium service. It works well in the specified markets and avoids generic tech terms.",
+        "confidence_score": 91,
+        "domain_status": "likely available with .io, .ai or .fr extension",
+        "timestamp": "2026-01-18T16:11:19.660Z",
         "feedback": {
           "founder": "founder_b",
-          "reaction": "like",
-          "timestamp": "2026-01-18T15:17:36.550Z"
+          "reaction": "neutral",
+          "timestamp": "2026-01-18T16:15:46.107Z"
         }
       },
       {
         "id": "name_3",
-        "name": "Globobook",
-        "category": "compound",
-        "rationale": "Combining 'globo' (indicating a global approach) and 'book', this name signifies a worldwide booking solution. It sounds techy and international, fitting Founder A's preferences. The 'o' ending might also give it a subtly European/French feel for Founder B. It signifies a global approach to tackle complex booking challenges.",
-        "confidence_score": 75,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:16:53.817Z",
+        "name": "InnoVaud",
+        "category": "coined",
+        "rationale": "InnoVaud combines 'innovation', reflecting the company's innovative nature, and 'Vaud', a region in Switzerland known for its hospitality, creating a sophisticated, international feel. It's a blend of English and French influences that should resonate in the target markets.",
+        "confidence_score": 87,
+        "domain_status": "likely available with .io, .ai or .fr extension",
+        "timestamp": "2026-01-18T16:11:19.660Z",
         "feedback": {
           "founder": "founder_b",
-          "reaction": "dislike",
-          "timestamp": "2026-01-18T15:17:39.480Z"
+          "reaction": "like",
+          "timestamp": "2026-01-18T16:15:48.158Z"
         }
       },
       {
         "id": "name_4",
-        "name": "InnCognito",
-        "category": "coined",
-        "rationale": "This name merges 'inn' and 'incognito' to create a unique, catchy brand name. It carries the techy, English sound that Founder A prefers and uses a word ('incognito') that has French origins, appealing to Founder B. The name suggests the company works behind the scenes helping hotels with complex bookings.",
-        "confidence_score": 85,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:16:53.817Z",
+        "name": "PrestigePlanner",
+        "category": "compound",
+        "rationale": "PrestigePlanner incorporates English language and suggests a high-quality, professional service (Prestige) with planning (Planner), directly related to the company's function. It's professional, serious, and also innovative, covering both founders' personality vision.",
+        "confidence_score": 90,
+        "domain_status": "likely available with .io, .ai or .fr extension",
+        "timestamp": "2026-01-18T16:11:19.660Z",
         "feedback": {
           "founder": "founder_b",
           "reaction": "like",
-          "timestamp": "2026-01-18T15:17:41.965Z"
+          "timestamp": "2026-01-18T16:15:50.085Z"
         }
       },
       {
         "id": "name_5",
-        "name": "ChateauClick",
-        "category": "compound",
-        "rationale": "This name combines 'chateau' (a French word for castle often used to describe large hotels or mansions) and 'click'. It satisfies Founder B's preferences for French sounding names while also incorporating a digital, techy component to meet Founder A's preferences. The name communicates the company's focus on streamlining complex booking processes.",
-        "confidence_score": 80,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:16:53.817Z",
+        "name": "EliteReso",
+        "category": "coined",
+        "rationale": "EliteReso is a creative blend of 'elite' and 'reso' (short for reservation). It reflects the innovative, high-end service the company provides and works well in English and French markets. This name avoids generic tech terms and is professional, catering to founders' style preferences.",
+        "confidence_score": 88,
+        "domain_status": "likely available with .io, .ai or .fr extension",
+        "timestamp": "2026-01-18T16:11:19.660Z",
         "feedback": {
           "founder": "founder_b",
-          "reaction": "neutral",
-          "timestamp": "2026-01-18T15:17:47.170Z"
+          "reaction": "like",
+          "timestamp": "2026-01-18T16:15:52.260Z"
         }
       },
       {
         "id": "var_1",
-        "name": "BookCrate",
+        "name": "ReservHub",
         "category": "compound",
-        "rationale": "This English-themed tech name combines the concepts of booking and a crate (suggesting organization, storage, or delivery). It is evocative of the startup's purpose in a simple, memorable way. Despite the English sound, it should be easily understood in French as well.",
-        "confidence_score": 90,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:20:26.511Z",
+        "rationale": "This English-sounding tech name combines 'Reserve' and 'Hub', highlighting the company's role as an innovative central point for complex hotel bookings. It's simple and easy to pronounce for both English and French speakers. The name is also professional and serious, addressing Founder B's preference.",
+        "confidence_score": 88,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:13:29.137Z",
         "feedback": {
           "founder": "founder_b",
           "reaction": "neutral",
-          "timestamp": "2026-01-18T15:21:17.278Z"
+          "timestamp": "2026-01-18T16:14:02.236Z"
         }
       },
       {
         "id": "var_2",
-        "name": "RéservaTech",
+        "name": "TechPlanœ",
         "category": "compound",
-        "rationale": "This name merges the French word 'Réserva' with the universal 'Tech', creating a brand that speaks to both founders’ tastes. It is straightforward and effortlessly communicates the idea of tech-savvy reservation services.",
-        "confidence_score": 87,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:20:26.511Z",
+        "rationale": "The name combines Technology and Plan, a French word which means map/direction, addressing both Founders' preferences. The œ ligature gives it a distinct French touch. Its '.fr', '.io' or '.ai' domains are likely available. It connotes innovation and professionalism.",
+        "confidence_score": 90,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:13:29.137Z",
         "feedback": {
           "founder": "founder_b",
-          "reaction": "neutral",
-          "timestamp": "2026-01-18T15:21:21.665Z"
+          "reaction": "dislike",
+          "timestamp": "2026-01-18T16:14:04.536Z"
         }
       },
       {
         "id": "var_3",
-        "name": "CubiqueReserve",
+        "name": "iReso",
         "category": "coined",
-        "rationale": "Derived from 'Cube' (Cubique in French) and 'Reserve', this name is easy to pronounce in both English and French. It suggests a three-dimensional, comprehensive approach to reservation services. Its uniquely coined nature sets it apart and makes it memorable.",
-        "confidence_score": 80,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:20:26.511Z",
+        "rationale": "This is a tech-savvy name that resonates with innovative brands like iPhone, iRobot, Intel. It signalizes an innovative agent solution for complex hotel bookings. Also easy enough for French speakers and markets to adopt.",
+        "confidence_score": 85,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:13:29.137Z",
         "feedback": {
           "founder": "founder_b",
-          "reaction": "dislike",
-          "timestamp": "2026-01-18T15:21:24.021Z"
+          "reaction": "like",
+          "timestamp": "2026-01-18T16:14:08.481Z"
         }
       },
       {
         "id": "var_4",
-        "name": "VoyageMatrix",
-        "category": "metaphorical",
-        "rationale": "A combination of the French word for travel 'Voyage' and 'Matrix', this name suggests a comprehensive, networked approach to travel bookings. It blends techy undertones with a distinct travel theme, appealing to both founders.",
-        "confidence_score": 89,
-        "domain_status": "premium",
-        "timestamp": "2026-01-18T15:20:26.511Z",
+        "name": "FlexiClerk",
+        "category": "compound",
+        "rationale": "In line with Founder A's preference for English-sounding names, this compound name signifies the flexible and adaptive nature of the startup. It's also professional and straightforward, appealing to Founder B.",
+        "confidence_score": 87,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:13:29.137Z",
         "feedback": {
           "founder": "founder_b",
           "reaction": "dislike",
-          "timestamp": "2026-01-18T15:21:26.039Z"
+          "timestamp": "2026-01-18T16:14:10.927Z"
         }
       },
       {
         "id": "var_5",
-        "name": "TrekPivot",
-        "category": "compound",
-        "rationale": "This name comprises 'Trek', a universal term for travel, and 'Pivot', an English tech-related term. It suggests a centralized point for all kinds of travel – and should cater to both founders’ preferences. It is straightforward, catchy, and professional.",
-        "confidence_score": 88,
-        "domain_status": "available",
-        "timestamp": "2026-01-18T15:20:26.511Z",
+        "name": "EpochRencontre",
+        "category": "metaphorical",
+        "rationale": "An innovative and creative name that combines a tech-associated term 'Epoch' and a French term 'Rencontre' (meeting), suggesting a revolutionary junction for complex bookings. It balances tech and French name vibes, appealing to both Founders.",
+        "confidence_score": 89,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:13:29.137Z",
         "feedback": {
           "founder": "founder_b",
           "reaction": "dislike",
-          "timestamp": "2026-01-18T15:21:27.643Z"
+          "timestamp": "2026-01-18T16:14:13.267Z"
         }
+      },
+      {
+        "id": "name_1",
+        "name": "BookInnVue",
+        "category": "compound",
+        "rationale": "This name conveys the business concept ('Book' for booking, 'Inn' for hotel, 'Vue' for view in French) and balances the English and French sounding preferences. It's brandable, memorable and suggests a professional, innovative service. It works effectively in English and French speaking markets. The domain bookinnvue.io, .ai, .fr, .com are likely available.",
+        "confidence_score": 90,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:15:06.750Z"
+      },
+      {
+        "id": "name_2",
+        "name": "ReserVoyage",
+        "category": "compound",
+        "rationale": "The name combines 'Reserve' and 'Voyage', appealing to Founder A's English preference and Founder B's French preference. It relates directly to the business context (hotel bookings and travel) and is approachable for both English and French speakers. It reflects professionalism and innovation. The domain reservoyage.io, .ai, .fr, .com are likely available.",
+        "confidence_score": 91,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:15:06.750Z"
+      },
+      {
+        "id": "name_3",
+        "name": "StayParfait",
+        "category": "compound",
+        "rationale": "This name is a blend of English (Stay) and French (Parfait - Perfect), appealing to both founders. It aligns with the hotel industry and conveys a superior, professional service. It's also memorable, innovative and works across the target markets. The domain stayparfait.io, .ai, .fr, .com are likely available.",
+        "confidence_score": 89,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:15:06.750Z"
+      },
+      {
+        "id": "name_4",
+        "name": "LodgePrestige",
+        "category": "compound",
+        "rationale": "The name combines English (Lodge) with a word that is similar in French and English (Prestige), making it internationally friendly. It conveys an image of professional, high-quality service in the hotel booking industry. It's brandable, memorable and innovative. The domain lodgeprestige.io, .ai, .fr, .com are likely available.",
+        "confidence_score": 92,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:15:06.750Z"
+      },
+      {
+        "id": "name_5",
+        "name": "RoomCachet",
+        "category": "compound",
+        "rationale": "This name blends English (Room) with French (Cachet - Stamp/Seal of approval). It's brandable, memorable, and infers a high-quality, professional service. It works effectively in the target markets and is likely to be available as a domain (roomcachet.io, .ai, .fr, .com)",
+        "confidence_score": 88,
+        "domain_status": "likely available",
+        "timestamp": "2026-01-18T16:15:06.750Z"
       }
     ],
     "names_evaluated": [],
@@ -193,12 +238,12 @@
   },
   "progress_percentage": 0,
   "conversation_health": "healthy",
-  "updated_at": "2026-01-18T15:16:22.250Z",
+  "updated_at": "2026-01-18T16:10:40.240Z",
   "agent_interactions": [
     {
       "agent": "synthesizer",
       "action": "analyze_alignment",
-      "timestamp": "2026-01-18T15:16:30.704Z",
+      "timestamp": "2026-01-18T16:10:49.236Z",
       "result": {
         "alignment_areas": "🎯 **Areas of Alignment:**\n• Both targeting similar market: shared business focus\n• Shared geographic focus: shared business focus\n• Flexible on domain extensions\n• Tech/innovation focused approach",
         "balance_areas": "⚖️ **Areas to Balance:**\n• Different naming style preferences: A(As Founder A, I like English sounding tech names, ...) vs B(En tant que co-Foundateur B, j'aime les noms bien ...)\n• Personality balance: innovative vs Professionnel, sérieux\n• Cultural considerations for international appeal",
@@ -208,93 +253,139 @@
     {
       "agent": "namer",
       "action": "generate_names",
-      "timestamp": "2026-01-18T15:16:53.755Z",
+      "timestamp": "2026-01-18T16:11:19.648Z",
       "result": {
         "suggestions": [
           {
-            "name": "BookInnSuite",
+            "name": "BookClerk",
             "category": "compound",
-            "rationale": "This name combines 'booking', 'inn', and 'suite' — three words related to the hotel industry. It's an English sounding tech name that aims to satisfy Founder A's preferences. The name describes the company's mission to help hotels with complex bookings. Although it doesn't have a direct French connection, 'suite' is also a French word, which could subtly satisfy Founder B's preferences.",
-            "confidence_score": 85,
-            "domain_status": "available"
+            "rationale": "BookClerk incorporates an English tech sounding term (book) with a traditional service role (clerk), reflecting both Founder A and B's preferences. The name is simple, professional, and easily understood in both English and French markets. It conveys the innovative yet serious nature of the company.",
+            "confidence_score": 89,
+            "domain_status": "likely available with .io, .ai or .fr extension"
           },
           {
-            "name": "Reservorama",
+            "name": "ReservElite",
             "category": "compound",
-            "rationale": "This name merges 'reservation' and 'orama' (a suffix indicating a comprehensive view of something) to create a unique, memorable English name that aligns with Founder A's preferences. The 'orama' ending also gives the name a slightly French sound to satisfy Founder B's preferences. This name suggests that the company provides a comprehensive solution for hotel reservation complexities.",
-            "confidence_score": 80,
-            "domain_status": "available"
+            "rationale": "ReservElite represents a blend of English (Reserv for reservation) and French elite (Elite), thus satisfying both founders' preferences. This name appears innovative, serious, and high-end, indicating a premium service. It works well in the specified markets and avoids generic tech terms.",
+            "confidence_score": 91,
+            "domain_status": "likely available with .io, .ai or .fr extension"
           },
           {
-            "name": "Globobook",
-            "category": "compound",
-            "rationale": "Combining 'globo' (indicating a global approach) and 'book', this name signifies a worldwide booking solution. It sounds techy and international, fitting Founder A's preferences. The 'o' ending might also give it a subtly European/French feel for Founder B. It signifies a global approach to tackle complex booking challenges.",
-            "confidence_score": 75,
-            "domain_status": "available"
-          },
-          {
-            "name": "InnCognito",
+            "name": "InnoVaud",
             "category": "coined",
-            "rationale": "This name merges 'inn' and 'incognito' to create a unique, catchy brand name. It carries the techy, English sound that Founder A prefers and uses a word ('incognito') that has French origins, appealing to Founder B. The name suggests the company works behind the scenes helping hotels with complex bookings.",
-            "confidence_score": 85,
-            "domain_status": "available"
+            "rationale": "InnoVaud combines 'innovation', reflecting the company's innovative nature, and 'Vaud', a region in Switzerland known for its hospitality, creating a sophisticated, international feel. It's a blend of English and French influences that should resonate in the target markets.",
+            "confidence_score": 87,
+            "domain_status": "likely available with .io, .ai or .fr extension"
           },
           {
-            "name": "ChateauClick",
+            "name": "PrestigePlanner",
             "category": "compound",
-            "rationale": "This name combines 'chateau' (a French word for castle often used to describe large hotels or mansions) and 'click'. It satisfies Founder B's preferences for French sounding names while also incorporating a digital, techy component to meet Founder A's preferences. The name communicates the company's focus on streamlining complex booking processes.",
-            "confidence_score": 80,
-            "domain_status": "available"
+            "rationale": "PrestigePlanner incorporates English language and suggests a high-quality, professional service (Prestige) with planning (Planner), directly related to the company's function. It's professional, serious, and also innovative, covering both founders' personality vision.",
+            "confidence_score": 90,
+            "domain_status": "likely available with .io, .ai or .fr extension"
+          },
+          {
+            "name": "EliteReso",
+            "category": "coined",
+            "rationale": "EliteReso is a creative blend of 'elite' and 'reso' (short for reservation). It reflects the innovative, high-end service the company provides and works well in English and French markets. This name avoids generic tech terms and is professional, catering to founders' style preferences.",
+            "confidence_score": 88,
+            "domain_status": "likely available with .io, .ai or .fr extension"
           }
         ],
-        "analysis": "Generated 5 names based on business context: Our startup makes agents to help Hotels in their most complex booking requirements (corporate bookin...",
-        "timestamp": "2026-01-18T15:16:53.753Z"
+        "analysis": "Generated 5 names using comprehensive founder preferences including style, business context, target markets, domain preferences, and company personality",
+        "timestamp": "2026-01-18T16:11:19.645Z"
       }
     },
     {
       "agent": "namer",
       "action": "generate_variations",
-      "timestamp": "2026-01-18T15:20:26.404Z",
+      "timestamp": "2026-01-18T16:13:29.127Z",
       "result": {
         "suggestions": [
           {
-            "name": "BookCrate",
+            "name": "ReservHub",
             "category": "compound",
-            "rationale": "This English-themed tech name combines the concepts of booking and a crate (suggesting organization, storage, or delivery). It is evocative of the startup's purpose in a simple, memorable way. Despite the English sound, it should be easily understood in French as well.",
-            "confidence_score": 90,
-            "domain_status": "available"
-          },
-          {
-            "name": "RéservaTech",
-            "category": "compound",
-            "rationale": "This name merges the French word 'Réserva' with the universal 'Tech', creating a brand that speaks to both founders’ tastes. It is straightforward and effortlessly communicates the idea of tech-savvy reservation services.",
-            "confidence_score": 87,
-            "domain_status": "available"
-          },
-          {
-            "name": "CubiqueReserve",
-            "category": "coined",
-            "rationale": "Derived from 'Cube' (Cubique in French) and 'Reserve', this name is easy to pronounce in both English and French. It suggests a three-dimensional, comprehensive approach to reservation services. Its uniquely coined nature sets it apart and makes it memorable.",
-            "confidence_score": 80,
-            "domain_status": "available"
-          },
-          {
-            "name": "VoyageMatrix",
-            "category": "metaphorical",
-            "rationale": "A combination of the French word for travel 'Voyage' and 'Matrix', this name suggests a comprehensive, networked approach to travel bookings. It blends techy undertones with a distinct travel theme, appealing to both founders.",
-            "confidence_score": 89,
-            "domain_status": "premium"
-          },
-          {
-            "name": "TrekPivot",
-            "category": "compound",
-            "rationale": "This name comprises 'Trek', a universal term for travel, and 'Pivot', an English tech-related term. It suggests a centralized point for all kinds of travel – and should cater to both founders’ preferences. It is straightforward, catchy, and professional.",
+            "rationale": "This English-sounding tech name combines 'Reserve' and 'Hub', highlighting the company's role as an innovative central point for complex hotel bookings. It's simple and easy to pronounce for both English and French speakers. The name is also professional and serious, addressing Founder B's preference.",
             "confidence_score": 88,
-            "domain_status": "available"
+            "domain_status": "likely available"
+          },
+          {
+            "name": "TechPlanœ",
+            "category": "compound",
+            "rationale": "The name combines Technology and Plan, a French word which means map/direction, addressing both Founders' preferences. The œ ligature gives it a distinct French touch. Its '.fr', '.io' or '.ai' domains are likely available. It connotes innovation and professionalism.",
+            "confidence_score": 90,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "iReso",
+            "category": "coined",
+            "rationale": "This is a tech-savvy name that resonates with innovative brands like iPhone, iRobot, Intel. It signalizes an innovative agent solution for complex hotel bookings. Also easy enough for French speakers and markets to adopt.",
+            "confidence_score": 85,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "FlexiClerk",
+            "category": "compound",
+            "rationale": "In line with Founder A's preference for English-sounding names, this compound name signifies the flexible and adaptive nature of the startup. It's also professional and straightforward, appealing to Founder B.",
+            "confidence_score": 87,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "EpochRencontre",
+            "category": "metaphorical",
+            "rationale": "An innovative and creative name that combines a tech-associated term 'Epoch' and a French term 'Rencontre' (meeting), suggesting a revolutionary junction for complex bookings. It balances tech and French name vibes, appealing to both Founders.",
+            "confidence_score": 89,
+            "domain_status": "likely available"
           }
         ],
         "analysis": "Generated 5 new variations based on previous feedback",
-        "timestamp": "2026-01-18T15:20:26.402Z"
+        "timestamp": "2026-01-18T16:13:29.125Z"
+      }
+    },
+    {
+      "agent": "namer",
+      "action": "generate_names",
+      "timestamp": "2026-01-18T16:15:06.716Z",
+      "result": {
+        "suggestions": [
+          {
+            "name": "BookInnVue",
+            "category": "compound",
+            "rationale": "This name conveys the business concept ('Book' for booking, 'Inn' for hotel, 'Vue' for view in French) and balances the English and French sounding preferences. It's brandable, memorable and suggests a professional, innovative service. It works effectively in English and French speaking markets. The domain bookinnvue.io, .ai, .fr, .com are likely available.",
+            "confidence_score": 90,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "ReserVoyage",
+            "category": "compound",
+            "rationale": "The name combines 'Reserve' and 'Voyage', appealing to Founder A's English preference and Founder B's French preference. It relates directly to the business context (hotel bookings and travel) and is approachable for both English and French speakers. It reflects professionalism and innovation. The domain reservoyage.io, .ai, .fr, .com are likely available.",
+            "confidence_score": 91,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "StayParfait",
+            "category": "compound",
+            "rationale": "This name is a blend of English (Stay) and French (Parfait - Perfect), appealing to both founders. It aligns with the hotel industry and conveys a superior, professional service. It's also memorable, innovative and works across the target markets. The domain stayparfait.io, .ai, .fr, .com are likely available.",
+            "confidence_score": 89,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "LodgePrestige",
+            "category": "compound",
+            "rationale": "The name combines English (Lodge) with a word that is similar in French and English (Prestige), making it internationally friendly. It conveys an image of professional, high-quality service in the hotel booking industry. It's brandable, memorable and innovative. The domain lodgeprestige.io, .ai, .fr, .com are likely available.",
+            "confidence_score": 92,
+            "domain_status": "likely available"
+          },
+          {
+            "name": "RoomCachet",
+            "category": "compound",
+            "rationale": "This name blends English (Room) with French (Cachet - Stamp/Seal of approval). It's brandable, memorable, and infers a high-quality, professional service. It works effectively in the target markets and is likely to be available as a domain (roomcachet.io, .ai, .fr, .com)",
+            "confidence_score": 88,
+            "domain_status": "likely available"
+          }
+        ],
+        "analysis": "Generated 5 names using comprehensive founder preferences including style, business context, target markets, domain preferences, and company personality",
+        "timestamp": "2026-01-18T16:15:06.714Z"
       }
     }
   ]

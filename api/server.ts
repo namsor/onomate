@@ -401,49 +401,87 @@ Based on your responses, I recommend names that blend ${this.extractKeywords(aRe
   }
 
   private async generateNames(founderA: any, founderB: any, constraints: any) {
-    // Extract business context from responses
+    // Extract ALL responses from interview for comprehensive context
     const aResponses = founderA?.responses || [];
     const bResponses = founderB?.responses || [];
     
-    const businessContext = aResponses[1]?.content || bResponses[1]?.content || "";
+    // Map all interview responses
     const aStylePrefs = aResponses[0]?.content || "";
+    const aBusinessDesc = aResponses[1]?.content || "";
+    const aMarkets = aResponses[2]?.content || "";
+    const aDomainFlex = aResponses[3]?.content || "";
+    const aPersonality = aResponses[4]?.content || "";
+    
     const bStylePrefs = bResponses[0]?.content || "";
+    const bBusinessDesc = bResponses[1]?.content || "";
+    const bMarkets = bResponses[2]?.content || "";
+    const bDomainFlex = bResponses[3]?.content || "";
+    const bPersonality = bResponses[4]?.content || "";
     
-    // TODO: Replace with actual OpenAI API call using extracted context
-    // For now, generate contextually relevant names based on business
+    // Combine business context from both founders
+    const businessContext = aBusinessDesc || bBusinessDesc || "startup";
     
-    const suggestions = await this.generateContextualSuggestions(businessContext, aStylePrefs, bStylePrefs);
+    const suggestions = await this.generateContextualSuggestions(
+      businessContext, 
+      aStylePrefs, bStylePrefs,
+      aMarkets, bMarkets,
+      aDomainFlex, bDomainFlex,
+      aPersonality, bPersonality
+    );
     
     return {
       suggestions,
-      analysis: `Generated ${suggestions.length} names based on business context: ${businessContext.slice(0, 100)}...`,
+      analysis: `Generated ${suggestions.length} names using comprehensive founder preferences including style, business context, target markets, domain preferences, and company personality`,
       timestamp: new Date().toISOString()
     };
   }
 
-  private async generateContextualSuggestions(businessContext: string, styleA: string, styleB: string) {
+  private async generateContextualSuggestions(
+    businessContext: string, 
+    styleA: string, styleB: string,
+    marketsA: string, marketsB: string,
+    domainFlexA: string, domainFlexB: string,
+    personalityA: string, personalityB: string
+  ) {
     try {
-      console.log('Generating contextual suggestions with OpenAI for:', { businessContext, styleA, styleB });
+      console.log('Generating contextual suggestions with comprehensive OpenAI context');
       
-      const prompt = `You are an expert startup naming consultant. Generate 5 unique startup name suggestions based on the following context:
+      const prompt = `You are an expert startup naming consultant. Generate 5 unique startup name suggestions based on the comprehensive founder interviews:
 
-Business Context: ${businessContext}
-Founder A Style Preferences: ${styleA}
-Founder B Style Preferences: ${styleB}
+BUSINESS CONTEXT:
+${businessContext}
 
-Requirements:
-- Names should be memorable, brandable, and professional
-- Consider both founders' style preferences
-- Names should work internationally
+STYLE PREFERENCES:
+• Founder A: ${styleA}
+• Founder B: ${styleB}
+
+TARGET MARKETS:
+• Founder A focus: ${marketsA}
+• Founder B focus: ${marketsB}
+
+DOMAIN PREFERENCES:
+• Founder A flexibility: ${domainFlexA}
+• Founder B flexibility: ${domainFlexB}
+
+COMPANY PERSONALITY:
+• Founder A vision: ${personalityA}
+• Founder B vision: ${personalityB}
+
+NAMING REQUIREMENTS:
+- Balance both founders' style preferences (find creative compromises if different)
+- Work effectively in the specified target markets
+- Consider domain availability based on their flexibility
+- Reflect the desired company personality blend
+- Be memorable, brandable, and professional
 - Include mix of compound words, coined terms, and descriptive names
 - Avoid generic tech terms like "Tech", "Pro", "Solutions"
 
 For each name suggestion, provide:
 1. The name itself
 2. Category (compound/coined/descriptive/metaphorical)
-3. Detailed rationale explaining why it fits the business and founder preferences
-4. Confidence score (1-100)
-5. Likely domain availability (available/premium/unavailable)
+3. Detailed rationale explaining how it addresses ALL founder preferences
+4. Confidence score (1-100) based on how well it balances all requirements
+5. Likely domain availability considering their stated flexibility
 
 Respond in JSON format:
 {
@@ -451,7 +489,7 @@ Respond in JSON format:
     {
       "name": "ExampleName",
       "category": "compound",
-      "rationale": "Detailed explanation of why this name works...",
+      "rationale": "Detailed explanation addressing style, markets, personality, and domain considerations...",
       "confidence_score": 85,
       "domain_status": "available"
     }
@@ -463,7 +501,7 @@ Respond in JSON format:
         messages: [
           {
             role: 'system',
-            content: 'You are an expert startup naming consultant with deep knowledge of branding, linguistics, and market positioning. Generate creative, memorable business names that balance founder preferences with market viability.'
+            content: 'You are an expert startup naming consultant with deep knowledge of branding, linguistics, international markets, and domain strategy. Generate names that comprehensively address all founder requirements and market considerations.'
           },
           {
             role: 'user',
@@ -471,7 +509,7 @@ Respond in JSON format:
           }
         ],
         temperature: 0.8,
-        max_tokens: 1500
+        max_tokens: 2000 // Increased for more comprehensive analysis
       });
 
       const responseText = completion.choices[0]?.message?.content;
@@ -508,38 +546,65 @@ Respond in JSON format:
 
   private async generateVariations(founderA: any, founderB: any, previousSuggestions: any[], constraints: any) {
     try {
-      console.log('Generating name variations with OpenAI');
+      console.log('Generating name variations with comprehensive OpenAI context');
       
-      // Extract context from founder responses
+      // Extract ALL context from founder responses
       const aResponses = founderA?.responses || [];
       const bResponses = founderB?.responses || [];
+      
       const aStylePrefs = aResponses[0]?.content || "";
+      const aBusinessDesc = aResponses[1]?.content || "";
+      const aMarkets = aResponses[2]?.content || "";
+      const aDomainFlex = aResponses[3]?.content || "";
+      const aPersonality = aResponses[4]?.content || "";
+      
       const bStylePrefs = bResponses[0]?.content || "";
+      const bBusinessDesc = bResponses[1]?.content || "";
+      const bMarkets = bResponses[2]?.content || "";
+      const bDomainFlex = bResponses[3]?.content || "";
+      const bPersonality = bResponses[4]?.content || "";
       
       // Create a summary of previous suggestions for context
       const previousNames = previousSuggestions.map(name => `${name.name} (${name.category})`).join(', ');
       
-      const prompt = `You are an expert startup naming consultant. Generate 5 NEW name variations and alternatives based on feedback from previous suggestions.
+      const prompt = `You are an expert startup naming consultant. Generate 5 NEW name variations and alternatives based on comprehensive founder feedback and previous suggestions.
 
-Previous Suggestions That Were Reviewed: ${previousNames}
+PREVIOUS SUGGESTIONS REVIEWED: ${previousNames}
 
-Founder A Style Preferences: ${aStylePrefs}
-Founder B Style Preferences: ${bStylePrefs}
+COMPLETE FOUNDER CONTEXT:
+Business: ${aBusinessDesc || bBusinessDesc}
 
-Requirements for Variations:
-- Create completely NEW names, not variations of the previous ones
-- Address any style conflicts between the founders with creative compromise solutions
+Style Preferences:
+• Founder A: ${aStylePrefs}
+• Founder B: ${bStylePrefs}
+
+Target Markets:
+• Founder A: ${aMarkets}
+• Founder B: ${bMarkets}
+
+Domain Flexibility:
+• Founder A: ${aDomainFlex}
+• Founder B: ${bDomainFlex}
+
+Company Personality:
+• Founder A: ${aPersonality}
+• Founder B: ${bPersonality}
+
+VARIATION REQUIREMENTS:
+- Create completely NEW names, not just modifications of previous ones
+- Address any style conflicts between founders with creative compromise solutions
+- Consider international market appeal based on their specified regions
+- Respect domain preferences and availability constraints
+- Balance different personality visions (professional vs innovative, etc.)
 - Include different naming approaches (compound, coined, descriptive, metaphorical)
-- Names should be memorable, brandable, and professional
-- Work internationally and be easy to pronounce
-- Avoid generic tech terms
+- Be memorable, brandable, and market-appropriate
 
 For each name suggestion, provide:
 1. The name itself
 2. Category (compound/coined/descriptive/metaphorical)
-3. Detailed rationale explaining how it addresses founder preferences and improves on previous feedback
-4. Confidence score (1-100)
-5. Likely domain availability (available/premium/unavailable)
+3. Detailed rationale explaining how it addresses ALL founder preferences and improves on previous feedback
+4. Confidence score (1-100) based on comprehensive requirement fulfillment
+5. Likely domain availability considering their stated flexibility
 
 Respond in JSON format:
 {
@@ -547,7 +612,7 @@ Respond in JSON format:
     {
       "name": "ExampleName",
       "category": "compound",
-      "rationale": "Detailed explanation of why this variation works...",
+      "rationale": "Comprehensive explanation addressing style, markets, personality, domain, and previous feedback...",
       "confidence_score": 85,
       "domain_status": "available"
     }
@@ -559,7 +624,7 @@ Respond in JSON format:
         messages: [
           {
             role: 'system',
-            content: 'You are an expert startup naming consultant specializing in creating name variations that address specific founder feedback and preferences. Focus on creative solutions that bridge style differences.'
+            content: 'You are an expert startup naming consultant specializing in creating comprehensive name variations that address all founder requirements, market considerations, and domain constraints. Focus on creative solutions that bridge all preference differences.'
           },
           {
             role: 'user',
@@ -567,7 +632,7 @@ Respond in JSON format:
           }
         ],
         temperature: 0.9, // Higher creativity for variations
-        max_tokens: 1500
+        max_tokens: 2000 // Increased for comprehensive analysis
       });
 
       const responseText = completion.choices[0]?.message?.content;

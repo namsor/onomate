@@ -44,6 +44,12 @@ const OnomateChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [alignmentAnalysisShown, setAlignmentAnalysisShown] = useState(false);
   const [messageCounter, setMessageCounter] = useState(0);
+  const [votingState, setVotingState] = useState<{
+    isVoting: boolean;
+    topCandidates: NameSuggestion[];
+    votes: { founder_a?: string; founder_b?: string };
+    finalDecision?: string;
+  }>({ isVoting: false, topCandidates: [], votes: {} });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const apiBase = 'http://localhost:3001';
 
@@ -183,7 +189,7 @@ const OnomateChat: React.FC = () => {
     if (responseCount === 0 || !lastResponse.trim()) {
       return "What type of name do you envision for your startup? Please describe the style or feeling you're looking for.";
     } else if (responseCount === 1) {
-      return "That sounds interesting! What industry or market are you targeting with your startup?";
+      return "That sounds interesting! Describe what you do and what industry or market are you targeting with your startup?";
     } else if (responseCount === 2) {
       return "How important is it that the name works internationally? Are there any specific markets you're focused on?";
     } else if (responseCount === 3) {
@@ -440,12 +446,33 @@ const OnomateChat: React.FC = () => {
   const processConvergenceMessage = async (message: string, founder: string) => {
     const lowerMessage = message.toLowerCase();
     
-    if (lowerMessage.includes('yes') || lowerMessage.includes('agree') || lowerMessage.includes('choose') || lowerMessage.includes('decide')) {
-      addSystemMessage("Excellent! It sounds like you're ready to make a decision. Let me help facilitate the final choice...", 'system_update');
-      
-      setTimeout(() => {
-        addSystemMessage("🎉 **Decision Support:** Based on your reactions, I recommend focusing on your top candidates. Would you like me to help you compare the final options or do you have a preferred choice in mind?", 'question');
-      }, 2000);
+    // Check for direct consensus completion
+    if (lowerMessage.includes('move forward') || lowerMessage.includes('go with') || lowerMessage.includes('choose this') || lowerMessage.includes('pick this') || lowerMessage.includes('this name')) {
+      await handleDirectConsensus();
+    } else if (lowerMessage.includes('vote') || lowerMessage.includes('voting') || lowerMessage.includes('final vote')) {
+      await startFinalVoting();
+    } else if (votingState.isVoting && (lowerMessage.includes('choose') || lowerMessage.includes('pick') || lowerMessage.includes('select'))) {
+      // Handle voting selection - look for name mentions in the message
+      await handleVote(message, founder);
+    } else if (lowerMessage.includes('yes') || lowerMessage.includes('agree') || lowerMessage.includes('choose') || lowerMessage.includes('decide')) {
+      if (!votingState.isVoting) {
+        // Check if there's already a clear single consensus before starting voting
+        const strongCandidates = nameSuggestions.filter(name => {
+          const aReaction = name.founder_reactions?.founder_a;
+          const bReaction = name.founder_reactions?.founder_b;
+          return (aReaction === 'love' || aReaction === 'like') && (bReaction === 'love' || bReaction === 'like');
+        });
+        
+        if (strongCandidates.length === 1) {
+          // Clear single consensus - skip voting and complete directly
+          await completeWithConsensus(strongCandidates[0]);
+        } else {
+          addSystemMessage("Excellent! It sounds like you're ready to make a decision. Let me set up a final vote between your top candidates...", 'system_update');
+          setTimeout(async () => {
+            await startFinalVoting();
+          }, 2000);
+        }
+      }
     } else if (lowerMessage.includes('more') || lowerMessage.includes('different') || lowerMessage.includes('other') || 
                lowerMessage.includes('additional') || lowerMessage.includes('suggestions') || 
                lowerMessage.includes('explore') || lowerMessage.includes('variations') || 
@@ -495,6 +522,170 @@ const OnomateChat: React.FC = () => {
       setTimeout(() => {
         addSystemMessage("Would you like me to: 1) Generate completely new suggestions with a different approach, 2) Focus on finding compromise solutions, or 3) Help you articulate what you're both looking for?", 'question');
       }, 2500);
+    }
+  };
+
+  const startFinalVoting = async () => {
+    // Find the top 2 candidates based on reactions
+    const candidatesWithScores = nameSuggestions.map(name => {
+      const aReaction = name.founder_reactions?.founder_a;
+      const bReaction = name.founder_reactions?.founder_b;
+      const reactionScores = { love: 5, like: 4, neutral: 3, dislike: 2, reject: 1 };
+      const aScore = aReaction ? reactionScores[aReaction] : 0;
+      const bScore = bReaction ? reactionScores[bReaction] : 0;
+      return {
+        ...name,
+        totalScore: aScore + bScore,
+        hasPositiveReactions: (aScore >= 4 && bScore >= 3) || (aScore >= 3 && bScore >= 4)
+      };
+    }).filter(name => name.hasPositiveReactions)
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .slice(0, 2);
+
+    if (candidatesWithScores.length < 2) {
+      addSystemMessage("I notice we don't have enough strong candidates for a final vote yet. Let me generate some additional options that both founders might like...", 'system_update');
+      setTimeout(async () => {
+        await generateNameSuggestions();
+      }, 2000);
+      return;
+    }
+
+    setVotingState({
+      isVoting: true,
+      topCandidates: candidatesWithScores,
+      votes: {},
+      finalDecision: undefined
+    });
+
+    addSystemMessage("🗳️ **Final Voting Round**", 'system_update');
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const candidatesList = candidatesWithScores.map((name, index) => 
+      `**${index + 1}. ${name.name}** - ${name.rationale.slice(0, 60)}...`
+    ).join('\n');
+    
+    addSystemMessage(`Here are your two finalists:\n${candidatesList}\n\nEach founder should now vote for their preferred choice. Simply say "I choose [name]" or "I vote for [name]".`, 'question');
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    addSystemMessage(`**${currentFounder === 'founder_a' ? 'Founder A' : 'Founder B'}**, please cast your vote first.`, 'question');
+  };
+
+  const handleVote = async (message: string, founder: string) => {
+    const topNames = votingState.topCandidates.map(c => c.name.toLowerCase());
+    const lowerMessage = message.toLowerCase();
+    
+    let votedName = null;
+    for (const name of topNames) {
+      if (lowerMessage.includes(name)) {
+        votedName = votingState.topCandidates.find(c => c.name.toLowerCase() === name)?.name;
+        break;
+      }
+    }
+    
+    if (!votedName) {
+      addSystemMessage(`Please specify which name you're voting for: ${votingState.topCandidates.map(c => c.name).join(' or ')}.`, 'question');
+      return;
+    }
+    
+    const newVotes = { ...votingState.votes, [founder]: votedName };
+    setVotingState(prev => ({ ...prev, votes: newVotes }));
+    
+    addSystemMessage(`✅ **${founder.replace('_', ' ')} votes for: ${votedName}**`, 'system_update');
+    
+    // Check if both founders have voted
+    if (newVotes.founder_a && newVotes.founder_b) {
+      await processFinalDecision(newVotes);
+    } else {
+      const otherFounder = founder === 'founder_a' ? 'founder_b' : 'founder_a';
+      setCurrentFounder(otherFounder as 'founder_a' | 'founder_b');
+      addSystemMessage(`**${otherFounder.replace('_', ' ')}**, please cast your vote.`, 'question');
+    }
+  };
+
+  const processFinalDecision = async (votes: { founder_a: string; founder_b: string }) => {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    if (votes.founder_a === votes.founder_b) {
+      // Both voted for the same name - clear winner!
+      addSystemMessage(`🎉 **Unanimous Decision!** Both founders chose: **${votes.founder_a}**`, 'system_update');
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      addSystemMessage(`Congratulations! You've successfully chosen "${votes.founder_a}" as your startup name. This name received support from both founders and aligns with your shared vision.`, 'message');
+      
+      setVotingState(prev => ({ ...prev, finalDecision: votes.founder_a }));
+      
+    } else {
+      // Tie - random selection
+      addSystemMessage(`📊 **Vote Results:**\n• Founder A: ${votes.founder_a}\n• Founder B: ${votes.founder_b}\n\nWe have a tie! Let me randomly select the winner...`, 'system_update');
+      
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const randomWinner = Math.random() < 0.5 ? votes.founder_a : votes.founder_b;
+      addSystemMessage(`🎲 **Random Selection Result:** **${randomWinner}**`, 'system_update');
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      addSystemMessage(`Your startup name is: **${randomWinner}**! While this was decided by chance, both names were strong candidates that received positive feedback. Congratulations on completing the naming process!`, 'message');
+      
+      setVotingState(prev => ({ ...prev, finalDecision: randomWinner }));
+    }
+    
+    // Mark session as complete
+    if (sessionState) {
+      setSessionState(prev => prev ? {
+        ...prev,
+        current_flow: "completed",
+        current_stage: "decision_made",
+        progress_percentage: 100
+      } : prev);
+    }
+  };
+
+  const handleDirectConsensus = async () => {
+    // Find the name with strongest support (mentioned in recent analysis)
+    const strongCandidates = nameSuggestions.filter(name => {
+      const aReaction = name.founder_reactions?.founder_a;
+      const bReaction = name.founder_reactions?.founder_b;
+      return (aReaction === 'love' || aReaction === 'like') && (bReaction === 'love' || bReaction === 'like');
+    }).sort((a, b) => {
+      const getScore = (name: NameSuggestion) => {
+        const aReaction = name.founder_reactions?.founder_a;
+        const bReaction = name.founder_reactions?.founder_b;
+        const scores = { love: 5, like: 4, neutral: 3, dislike: 2, reject: 1 };
+        return (aReaction ? scores[aReaction] : 0) + (bReaction ? scores[bReaction] : 0);
+      };
+      return getScore(b) - getScore(a);
+    });
+
+    if (strongCandidates.length > 0) {
+      const topCandidate = strongCandidates[0];
+      await completeWithConsensus(topCandidate);
+    } else {
+      addSystemMessage("I'd like to confirm which name you want to move forward with. Could you specify the exact name?", 'question');
+    }
+  };
+
+  const completeWithConsensus = async (selectedName: NameSuggestion) => {
+    addSystemMessage(`🎉 **Consensus Decision!** Moving forward with: **${selectedName.name}**`, 'system_update');
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    addSystemMessage(`Congratulations! You've successfully chosen "${selectedName.name}" as your startup name. This name received positive support from both founders and represents your shared vision.`, 'message');
+    
+    // Mark as final decision
+    setVotingState(prev => ({ 
+      ...prev, 
+      finalDecision: selectedName.name,
+      isVoting: false
+    }));
+    
+    // Mark session as complete
+    if (sessionState) {
+      setSessionState(prev => prev ? {
+        ...prev,
+        current_flow: "completed",
+        current_stage: "consensus_reached",
+        progress_percentage: 100
+      } : prev);
     }
   };
 
@@ -853,6 +1044,41 @@ const OnomateChat: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {votingState.isVoting && (
+          <div className="voting-section">
+            <h3>🗳️ Final Vote</h3>
+            <div className="voting-candidates">
+              {votingState.topCandidates.map((candidate, index) => (
+                <div key={candidate.id} className="voting-candidate">
+                  <h4>{index + 1}. {candidate.name}</h4>
+                  <p>{candidate.rationale.slice(0, 100)}...</p>
+                  <div className="vote-status">
+                    {votingState.votes.founder_a === candidate.name && (
+                      <span className="vote-marker">✅ Founder A</span>
+                    )}
+                    {votingState.votes.founder_b === candidate.name && (
+                      <span className="vote-marker">✅ Founder B</span>
+                    )}
+                    {!votingState.votes[currentFounder] && !votingState.finalDecision && (
+                      <button 
+                        className="vote-button"
+                        onClick={() => handleVote(`I choose ${candidate.name}`, currentFounder)}
+                      >
+                        Vote for {candidate.name}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {votingState.finalDecision && (
+              <div className="final-decision">
+                <h3>🎉 Final Decision: {votingState.finalDecision}</h3>
+              </div>
+            )}
           </div>
         )}
 
