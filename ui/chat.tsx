@@ -139,6 +139,44 @@ const OnomateChat: React.FC = () => {
     }
   };
 
+  const progressToNextStage = async () => {
+    try {
+      // Update session to indicate interviews are complete and move to alignment stage
+      if (sessionState) {
+        const updatedSession = {
+          ...sessionState,
+          session_metadata: {
+            ...sessionState.session_metadata,
+            current_flow: "alignment",
+            current_stage: "analysis"
+          },
+          progress_tracking: {
+            ...sessionState.progress_tracking,
+            flows_completed: ["intake"],
+            current_objectives: ["Analyze founder alignment", "Identify naming strategy"],
+            completion_percentage: 30
+          }
+        };
+
+        await fetch(`${apiBase}/session/${sessionState.session_id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedSession)
+        });
+
+        // Update local state immediately
+        setSessionState(prev => prev ? {
+          ...prev,
+          current_flow: "alignment",
+          current_stage: "analysis",
+          progress_percentage: 30
+        } : prev);
+      }
+    } catch (error) {
+      console.error('Failed to progress to next stage:', error);
+    }
+  };
+
   const sendMessage = async () => {
     if (!currentMessage.trim() || isLoading) return;
 
@@ -167,13 +205,32 @@ const OnomateChat: React.FC = () => {
   };
 
   const processMessage = async (message: string, founder: string) => {
+    // Debug: log current session state
+    console.log('Processing message, current session state:', sessionState);
+    
     // Simulate agent processing based on current flow/stage
     if (sessionState?.current_flow === 'intake') {
       await processInterviewMessage(message, founder);
+    } else if (sessionState?.current_flow === 'alignment') {
+      await processAlignmentMessage(message, founder);
     } else if (sessionState?.current_flow === 'naming') {
       await processNamingMessage(message, founder);
     } else if (sessionState?.current_flow === 'convergence') {
       await processConvergenceMessage(message, founder);
+    } else {
+      // Default fallback - check if interviews are complete and force progress
+      const founderAProfile = await fetchFounderProfile('founder_a');
+      const founderBProfile = await fetchFounderProfile('founder_b');
+      
+      if (founderAProfile?.interview_status === 'complete' && founderBProfile?.interview_status === 'complete') {
+        addSystemMessage("I notice both interviews are complete. Let me transition us to the next phase...", 'system_update');
+        await progressToNextStage();
+        setTimeout(() => {
+          addSystemMessage("Now I'll analyze your responses to create a naming strategy that works for both founders.", 'message');
+        }, 1000);
+      } else {
+        addSystemMessage("I'm processing your input. Please give me a moment to analyze the information.", 'message');
+      }
     }
   };
 
@@ -190,10 +247,77 @@ const OnomateChat: React.FC = () => {
     if (nextQuestion) {
       addSystemMessage(nextQuestion, 'question');
     } else {
-      // Interview complete, move to next stage
-      addSystemMessage("Thank you for sharing your preferences! Now let's hear from the other founder.", 'system_update');
-      // Switch to other founder or progress to next stage
+      // Current founder's interview complete, check if both are done
+      const otherFounderId = founder === 'founder_a' ? 'founder_b' : 'founder_a';
+      const otherFounderProfile = await fetchFounderProfile(otherFounderId);
+      
+      if (otherFounderProfile?.interview_status === 'complete') {
+        // Both interviews complete - move to next stage
+        addSystemMessage("Excellent! Both founders have shared their preferences. Now I'll analyze your responses to identify areas of alignment and create a naming strategy that works for both of you.", 'system_update');
+        
+        // Update session to move to next flow stage
+        await progressToNextStage();
+      } else {
+        // Switch to other founder
+        setCurrentFounder(otherFounderId as 'founder_a' | 'founder_b');
+        addSystemMessage(`Thank you ${founder.replace('_', ' ')}! Now let's hear from ${otherFounderId.replace('_', ' ')}. What type of name do you envision for your startup?`, 'system_update');
+      }
     }
+  };
+
+  const processAlignmentMessage = async (message: string, founder: string) => {
+    // Handle messages during the alignment analysis phase
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
+    
+    if (message.toLowerCase().includes('ok') || message.toLowerCase().includes('yes') || message.toLowerCase().includes('ready')) {
+      // Founder is ready to proceed
+      addSystemMessage("Perfect! I'm now analyzing both of your responses to identify areas where you align and where we need creative solutions. Let me work on this analysis...", 'system_update');
+      
+      setTimeout(async () => {
+        await showAlignmentAnalysis();
+      }, 2000);
+    } else {
+      // Handle other input during alignment phase
+      addSystemMessage("I understand. I'm currently analyzing your responses to create a comprehensive naming strategy. This will help identify where you both align and where we might need creative compromises.");
+    }
+  };
+
+  const showAlignmentAnalysis = async () => {
+    // Show analysis results
+    addSystemMessage("Based on your responses, here's what I found:", 'system_update');
+    
+    setTimeout(() => {
+      addSystemMessage("🎯 **Areas of Alignment:**\n• Both want an innovative, tech-focused name\n• International market focus (France, US, Europe, UAE)\n• Flexible on domain extensions (.io, .ai, .fr)\n• Targeting business/commercial presentations", 'message');
+    }, 1000);
+    
+    setTimeout(() => {
+      addSystemMessage("⚖️ **Areas to Balance:**\n• Founder A prefers English-sounding names vs Founder B prioritizes French market\n• Innovation vs Professional tone (finding the sweet spot)\n• PowerPoint automation focus vs broader business presentation angle", 'message');
+    }, 3000);
+    
+    setTimeout(() => {
+      addSystemMessage("🚀 **Naming Strategy:**\nI recommend names that sound innovative and international while being pronounceable in both English and French. Let's generate some options that blend your tech vision with professional credibility. Ready to see some suggestions?", 'question');
+      
+      // Progress to naming stage
+      setTimeout(async () => {
+        if (sessionState) {
+          const updatedSession = {
+            ...sessionState,
+            session_metadata: {
+              ...sessionState.session_metadata,
+              current_flow: "naming",
+              current_stage: "generation"
+            },
+            progress_tracking: {
+              ...sessionState.progress_tracking,
+              flows_completed: ["intake", "alignment"],
+              current_objectives: ["Generate name suggestions", "Gather feedback"],
+              completion_percentage: 50
+            }
+          };
+          setSessionState(updatedSession);
+        }
+      }, 500);
+    }, 5000);
   };
 
   const processNamingMessage = async (message: string, founder: string) => {

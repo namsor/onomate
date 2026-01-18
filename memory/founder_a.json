@@ -1,6 +1,6 @@
 {
   "founder_id": "founder_a",
-  "timestamp": "2026-01-18T12:19:05.418Z",
+  "timestamp": "2026-01-18T12:29:36.941Z",
   "interview_status": "complete",
   "responses": [
     {
@@ -37,6 +37,26 @@
       "content": "Ok; What is the question?",
       "timestamp": "2026-01-18T12:19:05.397Z",
       "question_number": 7
+    },
+    {
+      "content": "As Founder A, I like English sounding tech names",
+      "timestamp": "2026-01-18T12:26:33.196Z",
+      "question_number": 8
+    },
+    {
+      "content": "ok",
+      "timestamp": "2026-01-18T12:26:51.435Z",
+      "question_number": 9
+    },
+    {
+      "content": "ok",
+      "timestamp": "2026-01-18T12:27:00.852Z",
+      "question_number": 10
+    },
+    {
+      "content": "ok",
+      "timestamp": "2026-01-18T12:29:36.932Z",
+      "question_number": 11
     }
   ],
   "profile": {

@@ -1,26 +1,19 @@
 {
-  "session_id": "session_1768736081072",
+  "session_id": "session_1768739365663",
   "status": "created",
   "session_metadata": {
-    "founders": [
-      "founder_a",
-      "founder_b"
-    ],
-    "facilitator_agent": "facilitator",
-    "current_flow": "intake",
-    "current_stage": "welcome",
-    "estimated_duration_minutes": 180,
-    "actual_duration_minutes": 0
+    "current_flow": "alignment",
+    "current_stage": "analysis"
   },
   "progress_tracking": {
-    "flows_completed": [],
+    "flows_completed": [
+      "intake"
+    ],
     "current_objectives": [
-      "Complete founder interviews"
+      "Analyze founder alignment",
+      "Identify naming strategy"
     ],
-    "next_milestones": [
-      "Gather individual preferences"
-    ],
-    "completion_percentage": 0
+    "completion_percentage": 30
   },
   "conversation_state": {
     "energy_level": "high",
@@ -34,7 +27,7 @@
   },
   "decision_trail": [
     {
-      "timestamp": "2026-01-18T11:34:41.072Z",
+      "timestamp": "2026-01-18T12:29:25.671Z",
       "decision_type": "session_start",
       "details": "Initiated naming session for co-founders",
       "agents_involved": [
@@ -50,5 +43,14 @@
     "names_evaluated": [],
     "shortlist": [],
     "final_decision": null
-  }
+  },
+  "current_flow": "intake",
+  "current_stage": "welcome",
+  "founder_profiles": {
+    "founder_a": {},
+    "founder_b": {}
+  },
+  "progress_percentage": 0,
+  "conversation_health": "healthy",
+  "updated_at": "2026-01-18T12:29:37.980Z"
 }
